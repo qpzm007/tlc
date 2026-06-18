@@ -52,8 +52,8 @@ export function renderHeader() {
     let mobileHTML = '';
     siteData.menus.forEach(menu => {
         const text = menu[currentLang];
-        // Use /#... to ensure navigation to main page sections works from subpages
-        const link = menu.link.startsWith('#') ? `/${menu.link}` : menu.link;
+        // Use index.html#... to ensure navigation to main page sections works from subpages
+        const link = menu.link.startsWith('#') ? `index.html${menu.link}` : menu.link;
         
         desktopHTML += `<a href="${link}" class="text-sm font-semibold hover:text-brand-500 transition duration-300 uppercase tracking-wide text-gray-300 hover:text-white" data-ko="${menu.ko}" data-en="${menu.en}">${text}</a>`;
         mobileHTML += `<a href="${link}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-white hover:bg-white/5" data-ko="${menu.ko}" data-en="${menu.en}">${text}</a>`;
