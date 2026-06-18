@@ -282,8 +282,8 @@ function renderLocation() {
     
     const mapImg = siteData.contact.mapImage || siteData.contact.mapIframe;
     const mapImageHTML = mapImg && (mapImg.startsWith('img_') || mapImg.startsWith('http') || mapImg.startsWith('data:image')) ? 
-        `<img data-img-id="${mapImg}" src="${mapImg.startsWith('data:image') ? mapImg : 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs='}" class="${mapImg.startsWith('data:image') || mapImg.startsWith('http') ? '' : 'lazy-firebase-image'} absolute inset-0 w-full h-full object-cover opacity-50 group-hover:opacity-80 transition duration-500">` 
-        : '';
+        `<img data-img-id="${mapImg}" src="${mapImg.startsWith('data:image') ? mapImg : 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs='}" class="${mapImg.startsWith('data:image') || mapImg.startsWith('http') ? '' : 'lazy-firebase-image'} absolute inset-0 w-full h-full object-cover transition duration-700 group-hover:scale-105">` 
+        : '<div class="absolute inset-0 flex flex-col items-center justify-center text-gray-600"><i class="ph ph-image text-5xl mb-4"></i><p>지도 이미지가 없습니다.</p></div>';
 
     container.innerHTML = `
     <section id="location" class="py-24 bg-[#0b1120] relative">
@@ -292,17 +292,22 @@ function renderLocation() {
                 <h2 class="text-sm font-bold text-brand-500 tracking-widest uppercase mb-2" data-i18n="locationSub"></h2>
                 <h3 class="text-3xl md:text-4xl font-bold text-white" data-i18n="locationTitle"></h3>
             </div>
-            <div class="bg-metal-800 p-2 rounded-2xl border border-white/10">
-                <div class="w-full h-96 bg-metal-900 rounded-xl flex flex-col items-center justify-center text-gray-500 relative overflow-hidden group">
+            <div class="bg-metal-800 p-2 rounded-2xl border border-white/10 mb-8 max-w-5xl mx-auto shadow-2xl">
+                <a href="${mapUrl}" target="_blank" class="w-full h-96 bg-metal-900 rounded-xl flex flex-col items-center justify-center text-gray-500 relative overflow-hidden group cursor-pointer block">
                     ${mapImageHTML}
-                    <div class="z-10 bg-black/60 p-6 rounded-xl backdrop-blur-sm border border-white/10 text-center group-hover:bg-black/80 transition relative">
-                        <i class="ph ph-map-pin text-5xl text-brand-500 mb-4"></i>
-                        <p class="text-lg text-white font-medium mb-4">${siteData.location[currentLang]}</p>
-                        <p data-i18n="mapDesc" class="mb-6"></p>
-                        <a href="${mapUrl}" target="_blank" class="bg-brand-600 hover:bg-brand-500 text-white font-bold py-3 px-6 rounded-md transition inline-flex items-center shadow-lg shadow-brand-500/20">
-                            <i class="ph ph-map-trifold mr-2 text-xl"></i> ${currentLang === 'ko' ? '구글 지도로 보기' : 'View on Google Maps'}
-                        </a>
+                    <div class="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition duration-300 z-10 flex items-center justify-center">
+                        <div class="opacity-0 group-hover:opacity-100 transform scale-95 group-hover:scale-100 transition duration-300 bg-brand-600 text-white font-bold py-3 px-8 rounded-full shadow-lg flex items-center">
+                            <i class="ph ph-map-trifold mr-2 text-2xl"></i> ${currentLang === 'ko' ? '지도 열기' : 'Open Map'}
+                        </div>
                     </div>
+                </a>
+            </div>
+            <div class="text-center">
+                <div class="inline-flex flex-col md:flex-row items-center justify-center bg-metal-800/50 px-8 py-5 rounded-xl border border-white/5 gap-3">
+                    <div class="w-10 h-10 rounded-full bg-brand-500/20 flex items-center justify-center text-brand-500 shrink-0">
+                        <i class="ph-fill ph-map-pin text-xl"></i>
+                    </div>
+                    <p class="text-lg md:text-xl text-white font-medium">${siteData.location[currentLang]}</p>
                 </div>
             </div>
         </div>
