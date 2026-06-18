@@ -280,11 +280,9 @@ function renderLocation() {
     const container = document.getElementById('location-container');
     const mapUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(siteData.location[currentLang])}`;
     
-    const mapImg = siteData.contact.mapImage;
-    const mapImageHTML = mapImg ? 
-        (mapImg.startsWith('http') || mapImg.startsWith('img_') ? 
-            `<img data-img-id="${mapImg}" src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" class="lazy-firebase-image absolute inset-0 w-full h-full object-cover opacity-50 group-hover:opacity-80 transition duration-500">` 
-            : `<i class="ph ${mapImg} text-5xl text-gray-700 absolute"></i>`) 
+    const mapImg = siteData.contact.mapImage || siteData.contact.mapIframe;
+    const mapImageHTML = mapImg && (mapImg.startsWith('img_') || mapImg.startsWith('http') || mapImg.startsWith('data:image')) ? 
+        `<img data-img-id="${mapImg}" src="${mapImg.startsWith('data:image') ? mapImg : 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs='}" class="${mapImg.startsWith('data:image') || mapImg.startsWith('http') ? '' : 'lazy-firebase-image'} absolute inset-0 w-full h-full object-cover opacity-50 group-hover:opacity-80 transition duration-500">` 
         : '';
 
     container.innerHTML = `
