@@ -22,6 +22,7 @@ function updateBrandNameUI() {
 // Authentication Check (Mock logic: ID: admin, PW: admin1234)
 function checkAuth() {
     if(siteData && siteData.brand) updateBrandNameUI();
+    updateInquiryBadge();
     const isLoggedIn = sessionStorage.getItem('admin_logged_in') === 'true';
     if (isLoggedIn) {
         loginModal.classList.add('hidden');
@@ -771,8 +772,21 @@ window.deleteClient = function(index) {
     }
 };
 
+function updateInquiryBadge() {
+    const badge = document.getElementById('inquiry-badge');
+    if (!badge || !siteData.inquiries) return;
+    const newCount = siteData.inquiries.filter(i => i.status === 'new').length;
+    if (newCount > 0) {
+        badge.innerText = newCount;
+        badge.classList.remove('hidden');
+    } else {
+        badge.classList.add('hidden');
+    }
+}
+
 function renderInquiriesAdmin() {
     const inquiries = siteData.inquiries || [];
+    updateInquiryBadge();
     
     mainContent.innerHTML = `
         <div class="mb-8 flex justify-between items-center">
