@@ -141,7 +141,19 @@ export async function initFirebase() {
         const docSnap = await getDoc(docRef);
 
         if (docSnap.exists()) {
-            siteData = docSnap.data();
+            const firebaseData = docSnap.data();
+            siteData = {
+                ...siteData,
+                ...firebaseData,
+                brand: { ...siteData.brand, ...(firebaseData.brand || {}) },
+                company: { ...siteData.company, ...(firebaseData.company || {}) },
+                location: { ...siteData.location, ...(firebaseData.location || {}) },
+                contact: { ...siteData.contact, ...(firebaseData.contact || {}) },
+                i18n: {
+                    ko: { ...siteData.i18n.ko, ...(firebaseData.i18n?.ko || {}) },
+                    en: { ...siteData.i18n.en, ...(firebaseData.i18n?.en || {}) }
+                }
+            };
             console.log("Loaded data from Firebase.");
         } else {
             // Seed data to Firebase
