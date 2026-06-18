@@ -584,7 +584,7 @@ document.addEventListener('paste', async (e) => {
     const activeElement = document.activeElement;
     if (activeElement && activeElement.tagName === 'INPUT' && activeElement.type === 'text') {
         const items = (e.clipboardData || e.originalEvent.clipboardData).items;
-        for (let index in items) {
+        for (let index = 0; index < items.length; index++) {
             const item = items[index];
             if (item.kind === 'file' && item.type.startsWith('image/')) {
                 e.preventDefault();
@@ -592,7 +592,7 @@ document.addEventListener('paste', async (e) => {
                 
                 // Show uploading state
                 const originalValue = activeElement.value;
-                activeElement.value = "이미지 최적화 및 업로드 중...";
+                activeElement.value = "1. 이미지 압축 중...";
                 activeElement.disabled = true;
 
                 try {
@@ -621,10 +621,20 @@ document.addEventListener('paste', async (e) => {
                     
                     // 2) Export as WebP Blob
                     const optimizedBlob = await new Promise(resolve => canvas.toBlob(resolve, 'image/webp', 0.85));
+                    if (!optimizedBlob) throw new Error("Canvas export failed");
                     
-                    // 3) Upload to Firebase Storage
+                    activeElement.value = "2. Firebase에 업로드 중...";
+                    
+                    // 3) Upload to Firebase Storage with Timeout
                     const fileRef = ref(storage, 'images/' + Date.now() + '.webp');
-                    const snapshot = await uploadBytes(fileRef, optimizedBlob);
+                    
+                    // Set a 15-second timeout in case Storage is uninitialized and hangs
+                    const uploadTask = uploadBytes(fileRef, optimizedBlob);
+                    const timeoutTask = new Promise((_, reject) => 
+                        setTimeout(() => reject(new Error("Upload Timeout (Firebase Storage가 활성화되어 있지 않을 수 있습니다.)")), 15000)
+                    );
+                    
+                    const snapshot = await Promise.race([uploadTask, timeoutTask]);
                     const downloadURL = await getDownloadURL(snapshot.ref);
                     
                     activeElement.value = downloadURL;
@@ -632,11 +642,21 @@ document.addEventListener('paste', async (e) => {
                     activeElement.dispatchEvent(new Event('input', { bubbles: true }));
                 } catch (error) {
                     console.error("Upload failed", error);
-                    alert("이미지 업로드에 실패했습니다. Firebase Storage가 열려있는지 확인하세요.");
                     activeElement.value = originalValue;
+                    
+                    let errorMsg = "이미지 업로드에 실패했습니다.";
+                    if (error.code === 'storage/unauthorized') {
+                        errorMsg = "권한이 없습니다. Firebase Storage 규칙(Rules) 설정을 확인하세요.\\n예: allow read, write: if true;";
+                    } else if (error.message.includes('Timeout')) {
+                        errorMsg = "업로드 시간이 초과되었습니다.\\nFirebase Console에서 [Storage] 메뉴에 들어가 '시작하기'를 눌러 활성화했는지 확인하세요.";
+                    } else {
+                        errorMsg += "\\n상세: " + error.message;
+                    }
+                    alert(errorMsg);
                 } finally {
                     activeElement.disabled = false;
                 }
+                break; // Only process the first image found
             }
         }
     }
