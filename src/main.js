@@ -539,20 +539,20 @@ export function applyTranslations() {
     if (heroTitle) heroTitle.innerHTML = siteData.i18n[currentLang].heroTitle;
     
     const greeting = currentLang === 'ko' ? 
-        "안녕하십니까. 에이펙스 MCT의 AI 기술지원 어시스턴트입니다. 제품, 설비, 견적 등에 대해 무엇이든 물어보세요." : 
-        "Hello. I am the AI Support Assistant for Apex MCT. Ask me anything about products, equipment, or quoting procedures.";
+        "안녕하십니까. AI 기술지원 어시스턴트입니다. 제품, 설비, 견적 등에 대해 무엇이든 물어보세요." : 
+        "Hello. I am the AI Support Assistant. Ask me anything about products, equipment, or quoting procedures.";
     const chatGreeting = document.getElementById('chat-greeting');
     if (chatGreeting) chatGreeting.innerText = greeting;
 
     // Update document title based on current page
     const path = window.location.pathname;
     if (path.includes('products.html')) {
-        document.title = siteData.i18n[currentLang].pageTitleProducts || 'Apex MCT';
+        document.title = siteData.i18n[currentLang].pageTitleProducts || siteData.brand.name;
     } else if (path.includes('equipment.html')) {
-        document.title = siteData.i18n[currentLang].pageTitleEquipment || 'Apex MCT';
+        document.title = siteData.i18n[currentLang].pageTitleEquipment || siteData.brand.name;
     } else if (path.includes('certs.html')) {
-        document.title = siteData.i18n[currentLang].pageTitleCerts || 'Apex MCT';
+        document.title = siteData.i18n[currentLang].pageTitleCerts || siteData.brand.name;
     } else {
-        document.title = siteData.i18n[currentLang].pageTitleMain || 'Apex MCT';
+        document.title = siteData.i18n[currentLang].pageTitleMain || siteData.brand.name;
     }
 }

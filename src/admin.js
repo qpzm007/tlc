@@ -23,7 +23,7 @@ function updateBrandNameUI() {
 function checkAuth() {
     if(siteData && siteData.brand) updateBrandNameUI();
     if(siteData && siteData.i18n && siteData.i18n.ko) {
-        document.title = siteData.i18n.ko.pageTitleAdmin || "Apex MCT - CMS Admin";
+        document.title = siteData.i18n.ko.pageTitleAdmin || "CMS Admin";
     }
     updateInquiryBadge();
     const isLoggedIn = sessionStorage.getItem('admin_logged_in') === 'true';
@@ -43,7 +43,7 @@ async function saveSiteDataToFirebase() {
         await setDoc(docRef, siteData);
         updateBrandNameUI();
         if(siteData && siteData.i18n && siteData.i18n.ko) {
-            document.title = siteData.i18n.ko.pageTitleAdmin || "Apex MCT - CMS Admin";
+            document.title = siteData.i18n.ko.pageTitleAdmin || "CMS Admin";
         }
         alert("성공적으로 저장되었습니다! (DB 반영 완료)");
     } catch (error) {
@@ -112,7 +112,7 @@ function renderDashboard() {
     mainContent.innerHTML = `
         <div class="mb-8">
             <h1 class="text-3xl font-bold text-white mb-2">대시보드</h1>
-            <p class="text-gray-400">Apex MCT 관리자 시스템에 오신 것을 환영합니다.</p>
+            <p class="text-gray-400">관리자 시스템에 오신 것을 환영합니다.</p>
         </div>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             ${newInquiries > 0 ? `
