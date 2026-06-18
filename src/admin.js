@@ -901,7 +901,7 @@ function renderUITextAdmin() {
     const keys = Object.keys(siteData.i18n.ko);
     const groups = [
         { name: "🎯 메인 비주얼 (Hero)", match: key => key.startsWith('hero') || key.startsWith('btn') },
-        { name: "🏢 회사 소개", match: key => key.startsWith('company') || key.startsWith('ceo') || key.startsWith('cert') },
+        { name: "🏢 회사 소개", match: key => key.startsWith('company') || key.startsWith('ceo') || key.toLowerCase().includes('cert') },
         { name: "⚙️ 제품 및 포트폴리오", match: key => key.toLowerCase().includes('product') },
         { name: "🏭 보유 설비", match: key => key.toLowerCase().includes('equip') },
         { name: "🤝 고객사", match: key => key.startsWith('client') },
