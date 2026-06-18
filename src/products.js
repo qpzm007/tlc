@@ -1,22 +1,14 @@
 import { siteData, initFirebase, loadFirebaseImages } from './data.js';
 import { renderHeader, renderFooter, currentLang, applyTranslations } from './main.js';
 
-document.addEventListener('DOMContentLoaded', async () => {
-    await initFirebase();
-    
-    // Inject Header and Footer
-    renderHeader();
-    renderFooter();
-
+// Wait for main.js to initialize and fire languageChanged
+document.addEventListener('languageChanged', () => {
     renderAllProducts();
     applyTranslations();
     loadFirebaseImages();
 });
 
-document.addEventListener('languageChanged', () => {
-    renderAllProducts();
-    applyTranslations();
-});
+
 
 function renderAllProducts() {
     const container = document.getElementById('all-products-container');

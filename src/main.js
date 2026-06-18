@@ -49,6 +49,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     
     currentLang = userPref || defaultLang;
     init();
+    
+    // Dispatch event so subpages like products.js can safely render AFTER main.js initializes currentLang
+    document.dispatchEvent(new CustomEvent('languageChanged', { detail: currentLang }));
 });
 
 export function renderHeader() {
