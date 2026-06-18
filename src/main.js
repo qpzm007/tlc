@@ -200,7 +200,7 @@ function renderProducts() {
                 ${productsHTML}
             </div>
             <div class="text-center">
-                <a href="/products.html" class="inline-block border border-brand-500 text-brand-400 hover:bg-brand-500 hover:text-white font-bold py-3 px-8 rounded-full transition duration-300">
+                <a href="${import.meta.env.BASE_URL}products.html" class="inline-block border border-brand-500 text-brand-400 hover:bg-brand-500 hover:text-white font-bold py-3 px-8 rounded-full transition duration-300">
                     <span data-i18n="productsViewAll">모든 제품 보기</span> <i class="ph ph-arrow-right inline-block ml-1"></i>
                 </a>
             </div>
@@ -235,7 +235,7 @@ function renderEquipment() {
                 ${equipmentHTML}
             </div>
             <div class="text-center">
-                <a href="/equipment.html" class="inline-block border border-brand-500 text-brand-400 hover:bg-brand-500 hover:text-white font-bold py-3 px-8 rounded-full transition duration-300">
+                <a href="${import.meta.env.BASE_URL}equipment.html" class="inline-block border border-brand-500 text-brand-400 hover:bg-brand-500 hover:text-white font-bold py-3 px-8 rounded-full transition duration-300">
                     <span data-i18n="equipmentViewAll">모든 설비 보기</span> <i class="ph ph-arrow-right inline-block ml-1"></i>
                 </a>
             </div>
