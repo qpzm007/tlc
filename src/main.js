@@ -44,6 +44,10 @@ document.addEventListener('languageChanged', () => {
 
 document.addEventListener('DOMContentLoaded', async () => {
     await initFirebase();
+    if (!localStorage.getItem('tlc_lang') && siteData?.brand?.defaultLang) {
+        currentLang = siteData.brand.defaultLang;
+        localStorage.setItem('tlc_lang', currentLang);
+    }
     init();
 });
 

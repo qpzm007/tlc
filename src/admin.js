@@ -114,7 +114,7 @@ function renderDashboard() {
             <h1 class="text-3xl font-bold text-white mb-2">대시보드</h1>
             <p class="text-gray-400">Apex MCT 관리자 시스템에 오신 것을 환영합니다.</p>
         </div>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             ${newInquiries > 0 ? `
             <div class="bg-brand-500/20 p-6 rounded-xl border border-brand-500/50 cursor-pointer hover:bg-brand-500/30 transition" onclick="document.querySelector('[data-tab=\\'inquiries\\']').click()">
                 <div class="flex items-center justify-between mb-4">
@@ -146,6 +146,20 @@ function renderDashboard() {
                     <i class="ph ph-wrench text-2xl text-gray-500"></i>
                 </div>
                 <p class="text-3xl font-bold text-white">${siteData.equipment.length}</p>
+            </div>
+            <div class="bg-metal-800 p-6 rounded-xl border border-white/5 cursor-pointer hover:bg-white/5 transition" onclick="document.querySelector('[data-tab=\\'certs\\']').click()">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-gray-400 font-bold">인증서 관리</h3>
+                    <i class="ph ph-certificate text-2xl text-gray-500"></i>
+                </div>
+                <p class="text-3xl font-bold text-white">${siteData.company.certs.length}</p>
+            </div>
+            <div class="bg-metal-800 p-6 rounded-xl border border-white/5 cursor-pointer hover:bg-white/5 transition" onclick="document.querySelector('[data-tab=\\'clients\\']').click()">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-gray-400 font-bold">고객사 로고</h3>
+                    <i class="ph ph-users text-2xl text-gray-500"></i>
+                </div>
+                <p class="text-3xl font-bold text-white">${siteData.clients.length}</p>
             </div>
             <div class="bg-metal-800 p-6 rounded-xl border border-white/5 cursor-pointer hover:bg-white/5 transition" onclick="document.querySelector('[data-tab=\\'account\\']').click()">
                 <div class="flex items-center justify-between mb-4">
@@ -213,7 +227,7 @@ function renderCompanyAdmin() {
         </div>
         <div class="bg-metal-800 p-6 rounded-xl border border-white/5 space-y-6 mb-6">
             <h2 class="text-xl font-bold text-white border-b border-white/10 pb-2 mb-4">브랜드 설정</h2>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <div>
                     <label class="block text-sm font-medium text-white mb-2">회사명 (브랜드)</label>
                     <input type="text" id="company-name" class="w-full bg-metal-900 border border-white/10 rounded-md px-4 py-2 text-white focus:outline-none focus:border-brand-500" value="${siteData.brand.name}">
@@ -227,6 +241,14 @@ function renderCompanyAdmin() {
                     <label class="block text-sm font-medium text-white mb-2">메인 배경 이미지 URL</label>
                     <input type="text" id="hero-bg" class="w-full bg-metal-900 border border-white/10 rounded-md px-4 py-2 text-white focus:outline-none focus:border-brand-500 image-upload-target" value="${siteData.brand.heroBgUrl || ''}" placeholder="비워두면 기본 공장 이미지 사용">
                     <p class="text-xs text-gray-500 mt-1">메인 화면 텍스트 뒤에 깔리는 배경 이미지입니다.</p>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-white mb-2">초기 접속 언어 (Default)</label>
+                    <select id="default-lang" class="w-full bg-metal-900 border border-white/10 rounded-md px-4 py-2 text-white focus:outline-none focus:border-brand-500">
+                        <option value="ko" ${siteData.brand.defaultLang !== 'en' ? 'selected' : ''}>한국어 (KO)</option>
+                        <option value="en" ${siteData.brand.defaultLang === 'en' ? 'selected' : ''}>영어 (EN)</option>
+                    </select>
+                    <p class="text-xs text-gray-500 mt-1">방문자가 사이트에 처음 접속했을 때 보게 될 언어입니다.</p>
                 </div>
             </div>
         </div>
@@ -300,6 +322,7 @@ function renderCompanyAdmin() {
         siteData.brand.name = document.getElementById('company-name').value;
         siteData.brand.logoUrl = document.getElementById('company-logo').value;
         siteData.brand.heroBgUrl = document.getElementById('hero-bg').value;
+        siteData.brand.defaultLang = document.getElementById('default-lang').value;
         siteData.company.ceoMsg.ko = document.getElementById('company-ceo-ko').value.replace(/\n/g, '<br>');
         siteData.company.ceoMsg.en = document.getElementById('company-ceo-en').value.replace(/\n/g, '<br>');
         siteData.contact.phone = document.getElementById('contact-phone').value;
