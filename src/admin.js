@@ -650,26 +650,48 @@ document.addEventListener('paste', async (e) => {
 
 function renderUITextAdmin() {
     const keys = Object.keys(siteData.i18n.ko);
-    
+    const groups = [
+        { name: "🎯 메인 비주얼 (Hero)", match: key => key.startsWith('hero') || key.startsWith('btn') },
+        { name: "🏢 회사 소개", match: key => key.startsWith('company') || key.startsWith('ceo') || key.startsWith('cert') },
+        { name: "⚙️ 제품 및 포트폴리오", match: key => key.toLowerCase().includes('product') },
+        { name: "🏭 보유 설비", match: key => key.toLowerCase().includes('equip') },
+        { name: "🤝 고객사", match: key => key.startsWith('client') },
+        { name: "📍 위치 및 오시는 길", match: key => key.startsWith('location') || key.startsWith('map') },
+        { name: "📝 견적 문의 (Contact & CTA)", match: key => key.startsWith('contact') || key.startsWith('cta') },
+        { name: "💬 AI 챗봇 위젯", match: key => key.startsWith('chat') },
+        { name: "📜 하단 정보 (Footer)", match: key => key.startsWith('footer') },
+        { name: "기타 문구", match: () => true }
+    ];
+
     let rowsHTML = '';
-    keys.forEach(key => {
-        const koVal = (siteData.i18n.ko[key] || '').replace(/"/g, '&quot;');
-        const enVal = (siteData.i18n.en[key] || '').replace(/"/g, '&quot;');
-        rowsHTML += `
-            <div class="bg-metal-800 p-4 rounded-lg border border-white/5 mb-4">
-                <label class="block text-sm font-bold text-brand-500 mb-2">${key}</label>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <span class="text-xs border border-white/20 text-gray-400 px-1 rounded mb-1 inline-block">KO</span>
-                        <input type="text" data-lang="ko" data-key="${key}" value="${koVal}" class="w-full bg-metal-900 border border-white/10 rounded-md px-3 py-2 text-white text-sm focus:outline-none focus:border-brand-500 ui-text-input">
-                    </div>
-                    <div>
-                        <span class="text-xs border border-white/20 text-gray-400 px-1 rounded mb-1 inline-block">EN</span>
-                        <input type="text" data-lang="en" data-key="${key}" value="${enVal}" class="w-full bg-metal-900 border border-white/10 rounded-md px-3 py-2 text-white text-sm focus:outline-none focus:border-brand-500 ui-text-input">
+    const processedKeys = new Set();
+
+    groups.forEach(group => {
+        const groupKeys = keys.filter(key => !processedKeys.has(key) && group.match(key));
+        if (groupKeys.length === 0) return;
+        
+        rowsHTML += `<h2 class="text-xl font-bold text-white mt-8 mb-4 border-b border-brand-500/30 pb-2">${group.name}</h2>`;
+        
+        groupKeys.forEach(key => {
+            processedKeys.add(key);
+            const koVal = (siteData.i18n.ko[key] || '').replace(/"/g, '&quot;');
+            const enVal = (siteData.i18n.en[key] || '').replace(/"/g, '&quot;');
+            rowsHTML += `
+                <div class="bg-metal-800 p-4 rounded-lg border border-white/5 mb-4 ml-4">
+                    <label class="block text-sm font-bold text-brand-500 mb-2">${key}</label>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <span class="text-xs border border-white/20 text-gray-400 px-1 rounded mb-1 inline-block">KO</span>
+                            <input type="text" data-lang="ko" data-key="${key}" value="${koVal}" class="w-full bg-metal-900 border border-white/10 rounded-md px-3 py-2 text-white text-sm focus:outline-none focus:border-brand-500 ui-text-input">
+                        </div>
+                        <div>
+                            <span class="text-xs border border-white/20 text-gray-400 px-1 rounded mb-1 inline-block">EN</span>
+                            <input type="text" data-lang="en" data-key="${key}" value="${enVal}" class="w-full bg-metal-900 border border-white/10 rounded-md px-3 py-2 text-white text-sm focus:outline-none focus:border-brand-500 ui-text-input">
+                        </div>
                     </div>
                 </div>
-            </div>
-        `;
+            `;
+        });
     });
 
     mainContent.innerHTML = `
