@@ -1,6 +1,6 @@
-import { siteData } from './data.js';
+import { siteData, initFirebase } from './data.js';
 
-let currentLang = 'ko';
+export let currentLang = 'ko';
 
 export function getLang() { return currentLang; }
 export function setLang(lang) { 
@@ -13,7 +13,6 @@ function init() {
     renderHero();
     renderCompany();
     renderProducts();
-    renderPortfolio();
     renderEquipment();
     renderClients();
     renderLocation();
@@ -41,17 +40,23 @@ document.addEventListener('languageChanged', () => {
     init();
 });
 
-document.addEventListener('DOMContentLoaded', init);
+document.addEventListener('DOMContentLoaded', async () => {
+    await initFirebase();
+    init();
+});
 
-function renderHeader() {
+export function renderHeader() {
     const container = document.getElementById('header-container');
     
     let desktopHTML = '';
     let mobileHTML = '';
     siteData.menus.forEach(menu => {
         const text = menu[currentLang];
-        desktopHTML += `<a href="${menu.link}" class="text-sm font-semibold text-gray-300 hover:text-white transition uppercase tracking-wider">${text}</a>`;
-        mobileHTML += `<a href="${menu.link}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-white hover:bg-white/5 uppercase tracking-wider">${text}</a>`;
+        // Use /#... to ensure navigation to main page sections works from subpages
+        const link = menu.link.startsWith('#') ? `/${menu.link}` : menu.link;
+        
+        desktopHTML += `<a href="${link}" class="text-sm font-semibold hover:text-brand-500 transition duration-300 uppercase tracking-wide text-gray-300 hover:text-white" data-ko="${menu.ko}" data-en="${menu.en}">${text}</a>`;
+        mobileHTML += `<a href="${link}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-white hover:bg-white/5" data-ko="${menu.ko}" data-en="${menu.en}">${text}</a>`;
     });
 
     container.innerHTML = `
@@ -59,8 +64,11 @@ function renderHeader() {
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-20">
                 <div class="flex-shrink-0 flex items-center cursor-pointer" onclick="window.scrollTo(0,0)">
-                    <i class="ph ph-hexagon text-brand-500 text-4xl mr-2"></i>
-                    <span class="font-black text-xl tracking-widest uppercase">Apex<span class="text-brand-500">MCT</span></span>
+                    ${siteData.brand.logoUrl ? 
+                        `<img src="${siteData.brand.logoUrl}" alt="${siteData.brand.name} Logo" class="h-8 mr-2">` :
+                        `<i class="ph ph-hexagon text-brand-500 text-4xl mr-2"></i>`
+                    }
+                    <span class="font-black text-xl tracking-widest uppercase">${siteData.brand.name}</span>
                 </div>
                 <nav class="hidden md:flex space-x-8 items-center" id="desktop-menu">
                     ${desktopHTML}
@@ -70,13 +78,16 @@ function renderHeader() {
                         <i class="ph ph-globe"></i>
                         <span>${currentLang === 'ko' ? 'EN' : 'KR'}</span>
                     </button>
-                    <button id="mobile-menu-btn" class="md:hidden text-gray-300 hover:text-white p-2">
-                        <i class="ph ph-list text-2xl"></i>
-                    </button>
+                    <div class="md:hidden flex items-center">
+                        <button id="mobile-menu-btn" class="text-white hover:text-brand-500 transition">
+                            <i class="ph ph-list text-3xl"></i>
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
-        <div id="mobile-menu" class="md:hidden bg-metal-900 border-t border-white/10">
+        <!-- Mobile menu -->
+        <div id="mobile-menu" class="hidden md:hidden bg-metal-900 border-t border-white/10 absolute w-full left-0 top-20 z-40">
             <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
                 ${mobileHTML}
             </div>
@@ -166,57 +177,31 @@ function renderCompany() {
 
 function renderProducts() {
     const container = document.getElementById('products-container');
-    const productsHTML = siteData.products.map(prod => `
-        <div class="service-card p-8 rounded-xl bg-metal-800 border border-white/5 text-center flex flex-col items-center">
-            <div class="w-16 h-16 rounded-2xl bg-brand-500/10 flex items-center justify-center mb-6">
-                <i class="ph ${prod.img} text-4xl text-brand-400"></i>
-            </div>
-            <h4 class="text-xl font-bold text-white mb-3">${prod[currentLang].title}</h4>
-            <p class="text-gray-400 font-light text-sm leading-relaxed">${prod[currentLang].desc}</p>
+    const productsHTML = siteData.products
+        .filter(p => p.featured)
+        .map(p => `
+        <div class="bg-metal-900 border border-white/10 rounded-2xl p-8 hover:border-brand-500 transition duration-300 group flex flex-col">
+            ${p.img.startsWith('http') ? `<img src="${p.img}" class="w-full h-48 object-cover rounded-xl mb-6 group-hover:scale-105 transition duration-300">` : `<i class="ph ${p.img} text-5xl text-brand-500 mb-6 group-hover:scale-110 transition duration-300 inline-block"></i>`}
+            <h3 class="text-2xl font-bold text-white mb-4" data-ko="${p.ko.title}" data-en="${p.en.title}">${p[currentLang].title}</h3>
+            <p class="text-gray-400" data-ko="${p.ko.desc}" data-en="${p.en.desc}">${p[currentLang].desc}</p>
         </div>
     `).join('');
 
     container.innerHTML = `
-    <section id="products" class="py-24 bg-[#0b1120] relative">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 reveal">
+    <section id="products" class="py-24 bg-black relative">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             <div class="text-center mb-16">
-                <h2 class="text-sm font-bold text-brand-500 tracking-widest uppercase mb-2" data-i18n="productSub"></h2>
-                <h3 class="text-3xl md:text-4xl font-bold text-white" data-i18n="productTitle"></h3>
+                <h2 class="text-brand-500 font-bold tracking-widest uppercase mb-2" data-i18n="productsSub">Products</h2>
+                <h3 class="text-3xl md:text-5xl font-bold text-white" data-i18n="productsTitle">정밀 가공 포트폴리오</h3>
             </div>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
                 ${productsHTML}
             </div>
-        </div>
-    </section>`;
-}
-
-function renderPortfolio() {
-    const container = document.getElementById('portfolio-container');
-    container.innerHTML = `
-    <section id="portfolio" class="py-24 bg-metal-900 relative border-b border-white/5">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 reveal text-center">
-             <h2 class="text-sm font-bold text-brand-500 tracking-widest uppercase mb-2">${currentLang === 'ko' ? '가공 사례' : 'Portfolio'}</h2>
-             <h3 class="text-3xl md:text-4xl font-bold text-white mb-12">${currentLang === 'ko' ? '실제 정밀 가공 결과물' : 'Precision Machining Cases'}</h3>
-             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div class="bg-metal-800 rounded-xl overflow-hidden border border-white/5 aspect-video flex items-center justify-center text-gray-500 relative group cursor-pointer">
-                    <img src="https://images.unsplash.com/photo-1504328345606-18bbc8c9d7d1?auto=format&fit=crop&w=800&q=80" alt="Case 1" class="absolute inset-0 w-full h-full object-cover opacity-60 group-hover:opacity-100 transition duration-500">
-                    <div class="relative z-10 bg-black/50 w-full p-4 mt-auto opacity-0 group-hover:opacity-100 transition duration-300">
-                        <p class="text-white font-bold">5-Axis Impeller</p>
-                    </div>
-                </div>
-                <div class="bg-metal-800 rounded-xl overflow-hidden border border-white/5 aspect-video flex items-center justify-center text-gray-500 relative group cursor-pointer">
-                    <img src="https://images.unsplash.com/photo-1580983546523-149b0622e0cb?auto=format&fit=crop&w=800&q=80" alt="Case 2" class="absolute inset-0 w-full h-full object-cover opacity-60 group-hover:opacity-100 transition duration-500">
-                    <div class="relative z-10 bg-black/50 w-full p-4 mt-auto opacity-0 group-hover:opacity-100 transition duration-300">
-                        <p class="text-white font-bold">Aerospace Bracket</p>
-                    </div>
-                </div>
-                <div class="bg-metal-800 rounded-xl overflow-hidden border border-white/5 aspect-video flex items-center justify-center text-gray-500 relative group cursor-pointer">
-                    <img src="https://images.unsplash.com/photo-1590496793907-471a29ed6d36?auto=format&fit=crop&w=800&q=80" alt="Case 3" class="absolute inset-0 w-full h-full object-cover opacity-60 group-hover:opacity-100 transition duration-500">
-                    <div class="relative z-10 bg-black/50 w-full p-4 mt-auto opacity-0 group-hover:opacity-100 transition duration-300">
-                        <p class="text-white font-bold">Medical Device Housing</p>
-                    </div>
-                </div>
-             </div>
+            <div class="text-center">
+                <a href="/products.html" class="inline-block border border-brand-500 text-brand-400 hover:bg-brand-500 hover:text-white font-bold py-3 px-8 rounded-full transition duration-300">
+                    <span data-i18n="productsViewAll">모든 제품 보기</span> <i class="ph ph-arrow-right inline-block ml-1"></i>
+                </a>
+            </div>
         </div>
     </section>
     `;
@@ -224,23 +209,33 @@ function renderPortfolio() {
 
 function renderEquipment() {
     const container = document.getElementById('equipment-container');
-    const equipHTML = siteData.equipment.map(eq => `
-        <div class="p-6 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition">
-            <h4 class="text-lg font-bold text-white mb-1">${eq.name}</h4>
-            <p class="text-brand-400 text-sm font-semibold mb-3">${eq.spec}</p>
-            <p class="text-gray-400 text-xs">${eq[currentLang]}</p>
+    const equipmentHTML = siteData.equipment
+        .filter(eq => eq.featured)
+        .map(eq => `
+        <div class="bg-metal-800 rounded-xl overflow-hidden border border-white/10 hover:border-brand-500 transition duration-300 flex flex-col">
+            ${eq.img ? `<img src="${eq.img}" alt="${eq.name}" class="w-full h-48 object-cover">` : `<div class="w-full h-48 bg-metal-900 flex items-center justify-center"><i class="ph ph-image text-4xl text-gray-600"></i></div>`}
+            <div class="p-6 flex-1 flex flex-col justify-center">
+                <h4 class="text-xl font-bold text-white mb-2">${eq.name}</h4>
+                <p class="text-brand-400 font-medium mb-3">${eq.spec}</p>
+                <p class="text-gray-400 text-sm" data-ko="${eq.ko}" data-en="${eq.en}">${eq[currentLang]}</p>
+            </div>
         </div>
     `).join('');
 
     container.innerHTML = `
-    <section id="equipment" class="py-24 bg-[#0b1120] relative border-y border-white/5">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 reveal">
+    <section id="equipment" class="py-24 bg-[#0b1120] border-t border-white/5">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center mb-16">
-                <h2 class="text-sm font-bold text-brand-500 tracking-widest uppercase mb-2" data-i18n="equipSub"></h2>
-                <h3 class="text-3xl md:text-4xl font-bold text-white" data-i18n="equipTitle"></h3>
+                <h2 class="text-brand-500 font-bold tracking-widest uppercase mb-2" data-i18n="equipmentSub">Equipment</h2>
+                <h3 class="text-3xl md:text-5xl font-bold text-white" data-i18n="equipmentTitle">주요 보유 설비</h3>
             </div>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                ${equipHTML}
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+                ${equipmentHTML}
+            </div>
+            <div class="text-center">
+                <a href="/equipment.html" class="inline-block border border-brand-500 text-brand-400 hover:bg-brand-500 hover:text-white font-bold py-3 px-8 rounded-full transition duration-300">
+                    <span data-i18n="equipmentViewAll">모든 설비 보기</span> <i class="ph ph-arrow-right inline-block ml-1"></i>
+                </a>
             </div>
         </div>
     </section>`;
@@ -344,18 +339,23 @@ function renderInquiry() {
     </section>`;
 }
 
-function renderFooter() {
+export function renderFooter() {
     const container = document.getElementById('footer-container');
+    if (!container) return;
     container.innerHTML = `
     <footer class="bg-black py-12 border-t border-white/10 text-sm">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center text-gray-500">
             <div class="mb-4 md:mb-0 flex items-center">
-                <i class="ph ph-hexagon text-brand-500 text-2xl mr-2"></i>
-                <span class="font-bold text-white tracking-widest uppercase">Apex<span class="text-brand-500">MCT</span></span>
-                <span class="ml-4 pl-4 border-l border-white/10" data-i18n="footerAddress"></span>
+                ${siteData.brand.logoUrl ? 
+                    `<img src="${siteData.brand.logoUrl}" alt="${siteData.brand.name} Logo" class="h-6 mr-2 opacity-70">` :
+                    `<i class="ph ph-hexagon text-brand-500 text-2xl mr-2"></i>`
+                }
+                <span class="font-bold text-white tracking-widest uppercase" data-i18n="footerCompany">${siteData.i18n[currentLang].footerCompany}</span>
+                <span class="ml-4 pl-4 border-l border-white/10" data-i18n="footerAddress">${siteData.i18n[currentLang].footerAddress}</span>
+                <span class="ml-4 pl-4 border-l border-white/10" data-i18n="footerContact">${siteData.i18n[currentLang].footerContact}</span>
             </div>
             <div class="flex items-center space-x-4">
-                <p>&copy; 2026 Apex MCT Precision. All rights reserved.</p>
+                <p data-i18n="footerCopyright">${siteData.i18n[currentLang].footerCopyright}</p>
                 <a href="/admin.html" class="text-brand-500 hover:text-white transition ml-4 pl-4 border-l border-white/10">Admin Login</a>
             </div>
         </div>
@@ -423,16 +423,16 @@ function renderChat() {
     if (closeChatBtn) closeChatBtn.addEventListener('click', toggleChat);
 }
 
-function applyTranslations() {
+export function applyTranslations() {
     document.querySelectorAll('[data-i18n]').forEach(el => {
         const key = el.getAttribute('data-i18n');
-        if (siteData.i18n[currentLang][key]) {
+        if (siteData.i18n[currentLang] && siteData.i18n[currentLang][key]) {
             el.innerHTML = siteData.i18n[currentLang][key];
         }
     });
     document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
         const key = el.getAttribute('data-i18n-placeholder');
-        if (siteData.i18n[currentLang][key]) {
+        if (siteData.i18n[currentLang] && siteData.i18n[currentLang][key]) {
             el.placeholder = siteData.i18n[currentLang][key];
         }
     });

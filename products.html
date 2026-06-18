@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="ko" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apex MCT - 정밀 가공 포트폴리오</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <link rel="stylesheet" href="/src/style.css">
+</head>
+<body class="font-sans antialiased bg-black text-slate-50 flex flex-col min-h-screen">
+
+    <div id="header-container"></div>
+
+    <main class="flex-grow pt-20">
+        <!-- Hero Section for Subpage -->
+        <section class="py-20 bg-metal-900 border-b border-white/5 relative overflow-hidden">
+            <div class="absolute inset-0 opacity-10 bg-[url('https://images.unsplash.com/photo-1537462715879-360eeb61a0ad?w=1920&auto=format&fit=crop&q=80')] bg-cover bg-center"></div>
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
+                <h1 class="text-4xl md:text-6xl font-bold text-white mb-4 tracking-tight" data-i18n="subProductsTitle">정밀 가공 포트폴리오</h1>
+                <p class="text-xl text-gray-400 max-w-3xl mx-auto" data-i18n="subProductsDesc">최고의 정밀도와 신뢰성을 바탕으로 완성한 당사의 모든 제품과 가공 사례를 확인하십시오.</p>
+            </div>
+        </section>
+
+        <!-- All Products Grid -->
+        <section class="py-24 bg-black relative">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+                <div id="all-products-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <!-- Products will be injected here by JS -->
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <div id="footer-container"></div>
+
+    <!-- Scripts -->
+    <script type="module" src="/src/products.js"></script>
+</body>
+</html>

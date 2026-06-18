@@ -1,4 +1,11 @@
-export const siteData = {
+import { db } from './firebase.js';
+import { doc, getDoc, setDoc } from "firebase/firestore";
+
+export let siteData = {
+    brand: {
+        name: "ApexMCT",
+        logoUrl: "" // Leave empty to use text + icon, or add an image URL
+    },
     menus: [
         { id: 'company', link: '#company', ko: '회사소개', en: 'Company' },
         { id: 'products', link: '#products', ko: '제품소개', en: 'Products' },
@@ -18,27 +25,18 @@ export const siteData = {
         ]
     },
     products: [
-        {
-            img: 'ph-cpu',
-            ko: { title: '반도체 장비 부품', desc: '초정밀 공차가 요구되는 반도체 설비용 진공 챔버 및 핵심 구조물.' },
-            en: { title: 'Semiconductor Parts', desc: 'Vacuum chambers and core structures requiring ultra-precision tolerances.' }
-        },
-        {
-            img: 'ph-airplane-tilt',
-            ko: { title: '항공우주 부품', desc: '경량화 및 고강도가 필수적인 특수 합금(티타늄, 인코넬 등) 가공.' },
-            en: { title: 'Aerospace Components', desc: 'Special alloy machining (Titanium, Inconel) where lightweight and high strength are essential.' }
-        },
-        {
-            img: 'ph-guitar',
-            ko: { title: '프리미엄 하드웨어', desc: '미려한 외관과 정교한 조립 공차가 필요한 하이엔드 악기 및 기구 부품.' },
-            en: { title: 'Premium Hardware', desc: 'High-end instrument and device parts requiring flawless aesthetics and precise assembly tolerances.' }
-        }
+        { id: 'p1', img: 'https://images.unsplash.com/photo-1611077544789-7ebf4922f518?w=500&auto=format&fit=crop&q=60', featured: true, ko: { title: '반도체 챔버 및 핵심 부품', desc: '초정밀 공차가 요구되는 반도체 제조 설비용 진공 챔버 및 코어 파츠 가공' }, en: { title: 'Semiconductor Parts', desc: 'Vacuum chambers and core parts for semiconductor manufacturing' } },
+        { id: 'p2', img: 'https://images.unsplash.com/photo-1544724569-5f546fd6f2b6?w=500&auto=format&fit=crop&q=60', featured: true, ko: { title: '항공우주 정밀 브라켓', desc: '경량화 및 고강도가 필수적인 항공우주 산업용 특수 합금 가공' }, en: { title: 'Aerospace Brackets', desc: 'Special alloy machining for aerospace applications' } },
+        { id: 'p3', img: 'https://images.unsplash.com/photo-1579541591745-f0b12bc1d8ea?w=500&auto=format&fit=crop&q=60', featured: true, ko: { title: '의료기기 부품', desc: '생체 적합성 소재(티타늄 등)를 활용한 초정밀 의료기기 부품 가공' }, en: { title: 'Medical Device Parts', desc: 'Ultra-precision machining of biocompatible materials' } },
+        { id: 'p4', img: 'https://images.unsplash.com/photo-1616422340798-8ec1f681a029?w=500&auto=format&fit=crop&q=60', featured: false, ko: { title: '산업용 자동화 설비 부품', desc: '고속 회전 및 마찰을 견디는 고내구성 산업용 자동화 설비 부품 가공' }, en: { title: 'Industrial Automation Parts', desc: 'Highly durable parts for industrial automation equipment' } },
+        { id: 'p5', img: 'https://images.unsplash.com/photo-1563720223185-11003d516935?w=500&auto=format&fit=crop&q=60', featured: false, ko: { title: '정밀 금형 코어', desc: '마이크로 단위의 정밀도를 자랑하는 특수 금형 코어 및 인서트 가공' }, en: { title: 'Precision Mold Cores', desc: 'Micro-precision special mold cores and inserts' } },
+        { id: 'p6', img: 'https://images.unsplash.com/photo-1581093458791-9f3c3900df4b?w=500&auto=format&fit=crop&q=60', featured: false, ko: { title: '방산 기기 케이스', desc: '극한 환경 테스트를 통과한 방위산업용 내충격 케이스 가공' }, en: { title: 'Defense Equipment Cases', desc: 'Impact-resistant cases for defense industry' } },
     ],
     equipment: [
-        { name: 'Matsuura 5-Axis', spec: 'MAM72-35V (2대)', ko: '초정밀 5축 머시닝센터', en: '5-Axis Machining Center' },
-        { name: 'DMG MORI', spec: 'DMU 50 (3대)', ko: '고속 5축 머시닝센터', en: 'High-speed 5-Axis Machining Center' },
-        { name: 'Mazak', spec: 'VCN-530C (5대)', ko: '수직형 머시닝센터', en: 'Vertical Machining Center' },
-        { name: 'Zeiss CMM', spec: 'CONTURA (1대)', ko: '3차원 측정기', en: 'Coordinate Measuring Machine' }
+        { name: '5축 머시닝센터 (5-Axis MCT)', spec: 'DMU 50 (DMG MORI) - 2대', img: 'https://images.unsplash.com/photo-1565514020179-026b92b84bb6?w=500&auto=format&fit=crop&q=60', featured: true, ko: '복잡한 형상의 3D 곡면 및 동시 5축 가공용 최상급 설비', en: 'Top-tier equipment for complex 3D surfaces and simultaneous 5-axis machining' },
+        { name: '고속 머시닝센터 (High-Speed MCT)', spec: 'NX 6500 (DN솔루션즈) - 5대', img: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=500&auto=format&fit=crop&q=60', featured: true, ko: '초정밀 및 고속 가공을 통한 생산성 극대화', en: 'Maximizing productivity through ultra-precision and high-speed machining' },
+        { name: 'CNC 선반', spec: 'PUMA 2600 (DN솔루션즈) - 3대', img: 'https://images.unsplash.com/photo-1535312015038-f99a80eeb7fa?w=500&auto=format&fit=crop&q=60', featured: true, ko: '터닝 및 밀링 복합 가공을 위한 다기능 CNC', en: 'Multi-functional CNC for combined turning and milling' },
+        { name: '3차원 측정기 (CMM)', spec: 'CONTURA (ZEISS) - 1대', img: 'https://images.unsplash.com/photo-1581092160562-40aa08e78837?w=500&auto=format&fit=crop&q=60', featured: false, ko: '가공품의 마이크로 단위 정밀도 검증 및 품질 보증', en: 'Micro-level precision verification and quality assurance' }
     ],
     clients: [
         'GLOBAL TECH INC.', 'AEROSPACE DYNAMICS', 'PREMIUM INSTRUMENTS', 'KOREA SEMICON', 'NEXUS INNOVATION'
@@ -61,8 +59,24 @@ export const siteData = {
             productTitle: "주요 생산 제품",
             equipSub: "설비현황",
             equipTitle: "최첨단 가공 인프라",
+            productsSub: "제품소개",
+            productsTitle: "정밀 가공 포트폴리오",
+            productsViewAll: "모든 제품 보기",
+            equipmentSub: "설비현황",
+            equipmentTitle: "주요 보유 설비",
+            equipmentViewAll: "모든 설비 보기",
             clientSub: "주요고객사",
             clientTitle: "신뢰로 맺어진 글로벌 파트너",
+            contactSub: "문의하기",
+            contactTitle: "최적의 가공 솔루션을 제안합니다",
+            subProductsTitle: "정밀 가공 포트폴리오",
+            subProductsDesc: "최고의 정밀도와 신뢰성을 바탕으로 완성한 당사의 모든 제품과 가공 사례를 확인하십시오.",
+            subEquipmentTitle: "주요 보유 설비",
+            subEquipmentDesc: "고객의 다양한 요구를 충족시키는 최첨단 초정밀 가공 장비를 소개합니다.",
+            footerCompany: "에이펙스 스마트팩토리",
+            footerAddress: "경기도 부천시 정밀산업단지로 123",
+            footerContact: "Tel: 032-123-4567 | Email: contact@apex-mct.com",
+            footerCopyright: "© 2026 Apex MCT. All rights reserved.",
             locationSub: "오시는길",
             locationTitle: "에이펙스 MCT 본사 및 공장",
             mapDesc: "지도 API (Google Maps / Kakao Map) 연동 영역입니다.",
@@ -70,7 +84,6 @@ export const siteData = {
             ctaDesc: "엄격한 품질 기준을 요구하는 글로벌 기업들이 당사를 신뢰하는 이유를 직접 확인하십시오.",
             contactEmailLabel: "프로젝트 문의 및 도면 접수",
             contactPhoneLabel: "고객 지원 센터",
-            footerAddress: "경기도 부천시 정밀산업단지로 123",
             chatTitle: "Apex AI 기술지원",
             chatStatus: "온라인",
             chatPlaceholder: "메시지를 입력하세요..."
@@ -82,14 +95,26 @@ export const siteData = {
             btnConsult: "Inquire Project",
             btnExplore: "View Products",
             companySub: "Company",
-            ceoTitle: "CEO Greeting",
+            ceoTitle: "CEO Message",
             certTitle: "Certifications",
-            productSub: "Products",
-            productTitle: "Major Products",
-            equipSub: "Equipment",
-            equipTitle: "Advanced Infrastructure",
-            clientSub: "Major Clients",
-            clientTitle: "Global Partners Bound by Trust",
+            productsSub: "Products",
+            productsTitle: "Precision Machining Portfolio",
+            productsViewAll: "View All Products",
+            equipmentSub: "Equipment",
+            equipmentTitle: "Main Equipment",
+            equipmentViewAll: "View All Equipment",
+            clientSub: "Clients",
+            clientTitle: "Global Partners Built on Trust",
+            contactSub: "Contact",
+            contactTitle: "Proposing Optimal Machining Solutions",
+            subProductsTitle: "Precision Machining Portfolio",
+            subProductsDesc: "Discover all our products and machining cases completed with top precision and reliability.",
+            subEquipmentTitle: "Main Equipment",
+            subEquipmentDesc: "Introducing cutting-edge ultra-precision machining equipment to meet our customers' diverse needs.",
+            footerCompany: "Apex Smart Factory",
+            footerAddress: "123, Precision Industrial Complex-ro, Bucheon-si, Gyeonggi-do",
+            footerContact: "Tel: +82-32-123-4567 | Email: contact@apex-mct.com",
+            footerCopyright: "© 2026 Apex MCT. All rights reserved.",
             locationSub: "Location",
             locationTitle: "Apex MCT HQ & Factory",
             mapDesc: "Map API (Google Maps / Kakao Map) Integration Area.",
@@ -97,10 +122,27 @@ export const siteData = {
             ctaDesc: "Discover why global companies requiring strict quality standards trust us.",
             contactEmailLabel: "Project Inquiries & Blueprints",
             contactPhoneLabel: "Customer Support Center",
-            footerAddress: "123, Precision Industrial Complex-ro, Bucheon-si, Gyeonggi-do",
             chatTitle: "Apex AI Support",
             chatStatus: "Online",
             chatPlaceholder: "Type a message..."
         }
     }
 };
+
+export async function initFirebase() {
+    try {
+        const docRef = doc(db, "app", "siteData");
+        const docSnap = await getDoc(docRef);
+
+        if (docSnap.exists()) {
+            siteData = docSnap.data();
+            console.log("Loaded data from Firebase.");
+        } else {
+            // Seed data to Firebase
+            await setDoc(docRef, siteData);
+            console.log("Seeded initial data to Firebase.");
+        }
+    } catch (error) {
+        console.error("Error initializing Firebase data: ", error);
+    }
+}
