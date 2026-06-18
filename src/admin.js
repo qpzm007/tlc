@@ -139,6 +139,39 @@ function renderCompanyAdmin() {
                 </div>
             </div>
         </div>
+        <div class="bg-metal-800 p-6 rounded-xl border border-white/5 space-y-6 mb-6">
+            <h2 class="text-xl font-bold text-white border-b border-white/10 pb-2 mb-4">연락처 및 오시는 길 (카카오/네이버 지도)</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                <div>
+                    <label class="block text-sm font-medium text-white mb-2">전화번호</label>
+                    <input type="text" id="contact-phone" class="w-full bg-metal-900 border border-white/10 rounded-md px-4 py-2 text-white focus:outline-none focus:border-brand-500" value="${siteData.contact.phone || ''}">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-white mb-2">팩스번호</label>
+                    <input type="text" id="contact-fax" class="w-full bg-metal-900 border border-white/10 rounded-md px-4 py-2 text-white focus:outline-none focus:border-brand-500" value="${siteData.contact.fax || ''}">
+                </div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                <div>
+                    <label class="block text-sm font-medium text-white mb-2">이메일</label>
+                    <input type="text" id="contact-email" class="w-full bg-metal-900 border border-white/10 rounded-md px-4 py-2 text-white focus:outline-none focus:border-brand-500" value="${siteData.contact.email || ''}">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-white mb-2">지도 퍼가기 HTML 태그 (카카오/구글맵)</label>
+                    <input type="text" id="contact-map" class="w-full bg-metal-900 border border-white/10 rounded-md px-4 py-2 text-white focus:outline-none focus:border-brand-500" value="${(siteData.contact.mapIframe || '').replace(/"/g, '&quot;')}" placeholder="<iframe src=...></iframe>">
+                </div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                <div>
+                    <label class="block text-sm font-medium text-white mb-2">주소 (한국어)</label>
+                    <input type="text" id="location-ko" class="w-full bg-metal-900 border border-white/10 rounded-md px-4 py-2 text-white focus:outline-none focus:border-brand-500" value="${siteData.location.ko}">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-white mb-2">주소 (영문)</label>
+                    <input type="text" id="location-en" class="w-full bg-metal-900 border border-white/10 rounded-md px-4 py-2 text-white focus:outline-none focus:border-brand-500" value="${siteData.location.en}">
+                </div>
+            </div>
+        </div>
         <div class="bg-metal-800 p-6 rounded-xl border border-white/5 space-y-6">
             <h2 class="text-xl font-bold text-white border-b border-white/10 pb-2 mb-4">CEO 인사말</h2>
             <div>
@@ -165,7 +198,9 @@ function renderCompanyAdmin() {
                 </div>
             </div>
             <div class="flex justify-end">
-                <button id="save-company-btn" class="bg-brand-600 hover:bg-brand-500 text-white font-bold py-2 px-6 rounded-md transition">변경사항 저장</button>
+                <button id="save-company-btn" class="bg-brand-600 hover:bg-brand-500 text-white font-bold py-2 px-6 rounded-md transition flex items-center">
+                    <i class="ph ph-floppy-disk mr-2"></i> 변경사항 저장
+                </button>
             </div>
         </div>
     `;
@@ -175,6 +210,12 @@ function renderCompanyAdmin() {
         siteData.brand.logoUrl = document.getElementById('company-logo').value;
         siteData.company.ceoMsg.ko = document.getElementById('company-ceo-ko').value.replace(/\n/g, '<br>');
         siteData.company.ceoMsg.en = document.getElementById('company-ceo-en').value.replace(/\n/g, '<br>');
+        siteData.contact.phone = document.getElementById('contact-phone').value;
+        siteData.contact.fax = document.getElementById('contact-fax').value;
+        siteData.contact.email = document.getElementById('contact-email').value;
+        siteData.contact.mapIframe = document.getElementById('contact-map').value;
+        siteData.location.ko = document.getElementById('location-ko').value;
+        siteData.location.en = document.getElementById('location-en').value;
         saveSiteDataToFirebase();
     });
 }
