@@ -67,7 +67,9 @@ export function renderHeader() {
             <div class="flex justify-between items-center h-20">
                 <div class="flex-shrink-0 flex items-center cursor-pointer" onclick="window.scrollTo(0,0)">
                     ${siteData.brand.logoUrl ? 
-                        `<img src="${siteData.brand.logoUrl}" alt="${siteData.brand.name} Logo" class="h-8 mr-2">` :
+                        (siteData.brand.logoUrl.startsWith('http') || siteData.brand.logoUrl.startsWith('img_') || siteData.brand.logoUrl.startsWith('data:image') ? 
+                            `<img data-img-id="${siteData.brand.logoUrl}" src="${siteData.brand.logoUrl.startsWith('data:image') ? siteData.brand.logoUrl : 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs='}" alt="${siteData.brand.name} Logo" class="${siteData.brand.logoUrl.startsWith('data:image') ? '' : 'lazy-firebase-image'} h-8 mr-2">` :
+                            `<img src="${siteData.brand.logoUrl}" alt="${siteData.brand.name} Logo" class="h-8 mr-2">`) :
                         `<i class="ph ph-hexagon text-brand-500 text-4xl mr-2"></i>`
                     }
                     <span class="font-black text-xl tracking-widest uppercase">${siteData.brand.name}</span>
@@ -388,7 +390,9 @@ export function renderFooter() {
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center text-gray-500">
             <div class="mb-4 md:mb-0 flex items-center">
                 ${siteData.brand.logoUrl ? 
-                    `<img src="${siteData.brand.logoUrl}" alt="${siteData.brand.name} Logo" class="h-6 mr-2 opacity-70">` :
+                    (siteData.brand.logoUrl.startsWith('http') || siteData.brand.logoUrl.startsWith('img_') || siteData.brand.logoUrl.startsWith('data:image') ? 
+                        `<img data-img-id="${siteData.brand.logoUrl}" src="${siteData.brand.logoUrl.startsWith('data:image') ? siteData.brand.logoUrl : 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs='}" alt="${siteData.brand.name} Logo" class="${siteData.brand.logoUrl.startsWith('data:image') ? '' : 'lazy-firebase-image'} h-6 mr-2 opacity-70">` :
+                        `<img src="${siteData.brand.logoUrl}" alt="${siteData.brand.name} Logo" class="h-6 mr-2 opacity-70">`) :
                     `<i class="ph ph-hexagon text-brand-500 text-2xl mr-2"></i>`
                 }
                 <span class="font-bold text-white tracking-widest uppercase" data-i18n="footerCompany">${siteData.i18n[currentLang].footerCompany}</span>
