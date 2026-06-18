@@ -19,9 +19,12 @@ function updateBrandNameUI() {
     if (sidebarEl) sidebarEl.innerHTML = `${name}<span class="text-brand-500">CMS</span>`;
 }
 
-// Authentication Check (Mock logic: ID: admin, PW: admin1234)
+// Authentication Check
 function checkAuth() {
     if(siteData && siteData.brand) updateBrandNameUI();
+    if(siteData && siteData.i18n && siteData.i18n.ko) {
+        document.title = siteData.i18n.ko.pageTitleAdmin || "Apex MCT - CMS Admin";
+    }
     updateInquiryBadge();
     const isLoggedIn = sessionStorage.getItem('admin_logged_in') === 'true';
     if (isLoggedIn) {
@@ -39,6 +42,9 @@ async function saveSiteDataToFirebase() {
         const docRef = doc(db, "app", "siteData");
         await setDoc(docRef, siteData);
         updateBrandNameUI();
+        if(siteData && siteData.i18n && siteData.i18n.ko) {
+            document.title = siteData.i18n.ko.pageTitleAdmin || "Apex MCT - CMS Admin";
+        }
         alert("성공적으로 저장되었습니다! (DB 반영 완료)");
     } catch (error) {
         console.error("Error saving data: ", error);
@@ -50,8 +56,11 @@ loginForm.addEventListener('submit', (e) => {
     e.preventDefault();
     const id = document.getElementById('admin-id').value;
     const pw = document.getElementById('admin-pw').value;
+    
+    const validId = siteData?.adminAccount?.id || 'admin';
+    const validPw = siteData?.adminAccount?.pw || 'admin1234';
 
-    if (id === 'admin' && pw === 'admin1234') {
+    if (id === validId && pw === validPw) {
         sessionStorage.setItem('admin_logged_in', 'true');
         loginError.classList.add('hidden');
         checkAuth();
@@ -90,35 +99,110 @@ tabs.forEach(tab => {
         if (tabName === 'uitext') renderUITextAdmin();
         if (tabName === 'clients') renderClientsAdmin();
         if (tabName === 'inquiries') renderInquiriesAdmin();
+        if (tabName === 'account') renderAccountAdmin();
     });
 });
 
 // --- Views ---
 
 function renderDashboard() {
+    // Check if new inquiries exist to show notification
+    const newInquiries = siteData.inquiries ? siteData.inquiries.filter(i => i.status === 'new').length : 0;
+    
     mainContent.innerHTML = `
         <div class="mb-8">
             <h1 class="text-3xl font-bold text-white mb-2">대시보드</h1>
-            <p class="text-gray-400">웹사이트 방문자 및 요약 정보를 확인하세요.</p>
+            <p class="text-gray-400">Apex MCT 관리자 시스템에 오신 것을 환영합니다.</p>
         </div>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div class="bg-metal-800 p-6 rounded-xl border border-white/5">
-                <div class="text-brand-500 mb-2"><i class="ph ph-users text-3xl"></i></div>
-                <h3 class="text-gray-400 text-sm font-medium">오늘 방문자</h3>
-                <p class="text-3xl font-bold text-white mt-1">128</p>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            ${newInquiries > 0 ? `
+            <div class="bg-brand-500/20 p-6 rounded-xl border border-brand-500/50 cursor-pointer hover:bg-brand-500/30 transition" onclick="document.querySelector('[data-tab=\\'inquiries\\']').click()">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-brand-400 font-bold">신규 문의</h3>
+                    <i class="ph ph-bell text-2xl text-brand-400 animate-pulse"></i>
+                </div>
+                <p class="text-3xl font-bold text-white">${newInquiries}건</p>
+                <p class="text-sm text-brand-300 mt-2">클릭하여 확인하기</p>
             </div>
-            <div class="bg-metal-800 p-6 rounded-xl border border-white/5">
-                <div class="text-green-500 mb-2"><i class="ph ph-envelope text-3xl"></i></div>
-                <h3 class="text-gray-400 text-sm font-medium">신규 문의</h3>
-                <p class="text-3xl font-bold text-white mt-1">2</p>
+            ` : `
+            <div class="bg-metal-800 p-6 rounded-xl border border-white/5 cursor-pointer hover:bg-white/5 transition" onclick="document.querySelector('[data-tab=\\'inquiries\\']').click()">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-gray-400 font-bold">총 문의 건수</h3>
+                    <i class="ph ph-envelope text-2xl text-gray-500"></i>
+                </div>
+                <p class="text-3xl font-bold text-white">${siteData.inquiries ? siteData.inquiries.length : 0}건</p>
             </div>
-            <div class="bg-metal-800 p-6 rounded-xl border border-white/5">
-                <div class="text-purple-500 mb-2"><i class="ph ph-cube text-3xl"></i></div>
-                <h3 class="text-gray-400 text-sm font-medium">등록된 제품</h3>
-                <p class="text-3xl font-bold text-white mt-1">3</p>
+            `}
+            <div class="bg-metal-800 p-6 rounded-xl border border-white/5 cursor-pointer hover:bg-white/5 transition" onclick="document.querySelector('[data-tab=\\'products\\']').click()">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-gray-400 font-bold">등록된 제품</h3>
+                    <i class="ph ph-cube text-2xl text-gray-500"></i>
+                </div>
+                <p class="text-3xl font-bold text-white">${siteData.products.length}</p>
+            </div>
+            <div class="bg-metal-800 p-6 rounded-xl border border-white/5 cursor-pointer hover:bg-white/5 transition" onclick="document.querySelector('[data-tab=\\'equipment\\']').click()">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-gray-400 font-bold">등록된 주요 설비</h3>
+                    <i class="ph ph-wrench text-2xl text-gray-500"></i>
+                </div>
+                <p class="text-3xl font-bold text-white">${siteData.equipment.length}</p>
+            </div>
+            <div class="bg-metal-800 p-6 rounded-xl border border-white/5 cursor-pointer hover:bg-white/5 transition" onclick="document.querySelector('[data-tab=\\'account\\']').click()">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-gray-400 font-bold">계정 관리</h3>
+                    <i class="ph ph-lock-key text-2xl text-gray-500"></i>
+                </div>
+                <p class="text-sm text-white mt-2">아이디/비밀번호 변경</p>
             </div>
         </div>
     `;
+}
+
+function renderAccountAdmin() {
+    const currentId = siteData?.adminAccount?.id || 'admin';
+    mainContent.innerHTML = `
+        <div class="mb-8">
+            <h1 class="text-3xl font-bold text-white mb-2">관리자 계정 설정</h1>
+            <p class="text-gray-400">관리자 시스템에 로그인하기 위한 아이디와 비밀번호를 변경할 수 있습니다.</p>
+        </div>
+        <div class="max-w-xl bg-metal-800 p-8 rounded-xl border border-white/5">
+            <div class="space-y-6">
+                <div>
+                    <label class="block text-sm font-bold text-gray-400 mb-2">현재 계정 아이디</label>
+                    <input type="text" id="acc-id" value="${currentId}" class="w-full bg-metal-900 border border-white/10 rounded-md px-4 py-3 text-white focus:outline-none focus:border-brand-500">
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-gray-400 mb-2">새 비밀번호 (비워두면 기존 유지)</label>
+                    <input type="password" id="acc-pw" placeholder="새로운 비밀번호 입력" class="w-full bg-metal-900 border border-white/10 rounded-md px-4 py-3 text-white focus:outline-none focus:border-brand-500">
+                </div>
+                <button id="save-account-btn" class="w-full bg-brand-600 hover:bg-brand-500 text-white font-bold py-3 px-4 rounded-md transition duration-300 flex items-center justify-center">
+                    <i class="ph ph-floppy-disk mr-2"></i> 계정 정보 저장
+                </button>
+                <p class="text-xs text-brand-400 text-center mt-2">⚠️ 저장 시 안전을 위해 강제로 로그아웃되며, 새 계정 정보로 다시 로그인하셔야 합니다.</p>
+            </div>
+        </div>
+    `;
+
+    document.getElementById('save-account-btn').addEventListener('click', async () => {
+        const newId = document.getElementById('acc-id').value.trim();
+        const newPw = document.getElementById('acc-pw').value;
+        
+        if (!newId) {
+            alert("아이디는 비워둘 수 없습니다.");
+            return;
+        }
+
+        if (!siteData.adminAccount) siteData.adminAccount = {};
+        siteData.adminAccount.id = newId;
+        if (newPw) siteData.adminAccount.pw = newPw;
+
+        await saveSiteDataToFirebase();
+        alert("계정 정보가 변경되었습니다. 다시 로그인 해주세요.");
+        
+        // Force logout
+        sessionStorage.removeItem('admin_logged_in');
+        checkAuth();
+    });
 }
 
 function renderCompanyAdmin() {

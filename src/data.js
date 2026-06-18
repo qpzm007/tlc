@@ -13,6 +13,7 @@ export let siteData = {
         { id: 'clients', link: '#clients', ko: '주요고객사', en: 'Clients' },
         { id: 'location', link: '#location', ko: '오시는길', en: 'Location' }
     ],
+    adminAccount: { id: "admin", pw: "admin1234" },
     company: {
         ceoMsg: {
             ko: "안녕하십니까, 에이펙스 MCT 대표입니다.<br><br>당사는 설립 이래 끊임없는 기술 혁신과 철저한 품질 관리를 바탕으로, 프리미엄 정밀 가공 분야의 기준을 세워왔습니다.<br>글로벌 탑티어 고객사들이 요구하는 까다로운 스펙과 완벽한 마감을 구현하기 위해, 우리는 매 순간 한 치의 오차도 허용하지 않는 장인정신으로 임하고 있습니다.<br><br>고객의 신뢰를 최우선으로 생각하며, 최고의 품질과 정확한 납기로 성공적인 비즈니스 파트너가 될 것을 약속드립니다.",
@@ -58,6 +59,7 @@ export let siteData = {
             pageTitleProducts: "Apex MCT - 정밀 가공 포트폴리오",
             pageTitleEquipment: "Apex MCT - 주요 설비 현황",
             pageTitleCerts: "Apex MCT - 인증현황",
+            pageTitleAdmin: "Apex MCT - CMS Admin",
             heroBadge: "초정밀 가공의 새로운 기준",
             heroTitle: "<span class='gradient-text'>정밀함</span>이<br>예술이 되는 순간",
             heroDesc: "타협하지 않는 장인정신과 최첨단 MCT 기술. 세계 최고 수준을 요구하는 고객사의 완벽한 파트너가 됩니다.",
@@ -106,6 +108,7 @@ export let siteData = {
             pageTitleProducts: "Apex MCT - Precision Machining Portfolio",
             pageTitleEquipment: "Apex MCT - Main Equipment",
             pageTitleCerts: "Apex MCT - Quality & Certifications",
+            pageTitleAdmin: "Apex MCT - CMS Admin",
             heroBadge: "New Standard of Precision",
             heroTitle: "Where <span class='gradient-text'>Precision</span><br>Becomes Art",
             heroDesc: "Uncompromising craftsmanship and cutting-edge MCT tech. The perfect partner for clients demanding world-class standards.",
@@ -159,6 +162,7 @@ export async function initFirebase() {
                 ...siteData,
                 ...firebaseData,
                 brand: { ...siteData.brand, ...(firebaseData.brand || {}) },
+                adminAccount: { ...siteData.adminAccount, ...(firebaseData.adminAccount || {}) },
                 company: { ...siteData.company, ...(firebaseData.company || {}) },
                 location: { ...siteData.location, ...(firebaseData.location || {}) },
                 contact: { ...siteData.contact, ...(firebaseData.contact || {}) },
