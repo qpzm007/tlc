@@ -772,48 +772,52 @@ window.deleteClient = function(index) {
 };
 
 function renderInquiriesAdmin() {
+    const inquiries = siteData.inquiries || [];
+    
     mainContent.innerHTML = `
-        <div class="mb-8">
-            <h1 class="text-3xl font-bold text-white mb-2">온라인 문의 내역</h1>
-            <p class="text-gray-400">웹사이트를 통해 접수된 견적 및 문의 사항입니다.</p>
+        <div class="mb-8 flex justify-between items-center">
+            <div>
+                <h1 class="text-3xl font-bold text-white mb-2">온라인 문의 내역</h1>
+                <p class="text-gray-400">웹사이트를 통해 접수된 견적 및 문의 사항입니다. (총 ${inquiries.length}건)</p>
+            </div>
         </div>
         <div class="space-y-4">
-            <div class="bg-metal-800 p-6 rounded-xl border border-white/5 border-l-4 border-l-brand-500">
+            ${inquiries.length === 0 ? '<p class="text-gray-500 py-10 text-center">접수된 문의 내역이 없습니다.</p>' : inquiries.map((inq, index) => `
+            <div class="bg-metal-800 p-6 rounded-xl border border-white/5 ${inq.status === 'new' ? 'border-l-4 border-l-brand-500' : 'opacity-70'}">
                 <div class="flex justify-between items-start mb-4">
                     <div>
-                        <span class="bg-brand-500/20 text-brand-400 text-xs px-2 py-1 rounded font-bold mr-2">신규 대기</span>
-                        <span class="text-gray-400 text-sm">2026-06-18 10:30</span>
-                        <h3 class="text-xl font-bold text-white mt-1">반도체 진공 챔버 가공 견적 문의</h3>
+                        <span class="${inq.status === 'new' ? 'bg-brand-500/20 text-brand-400' : 'bg-gray-700 text-gray-300'} text-xs px-2 py-1 rounded font-bold mr-2 cursor-pointer hover:bg-brand-500 hover:text-white transition" onclick="window.toggleInquiryStatus(${index})" title="상태 변경">
+                            ${inq.status === 'new' ? '신규 대기' : '확인 완료'}
+                        </span>
+                        <span class="text-gray-400 text-sm">${inq.date}</span>
                     </div>
-                    <button class="bg-white/5 hover:bg-white/10 text-white px-3 py-1.5 rounded text-sm transition">상세 보기</button>
+                    <button onclick="window.deleteInquiry(${index})" class="bg-red-500/10 hover:bg-red-500/20 text-red-400 px-3 py-1.5 rounded text-sm transition"><i class="ph ph-trash mr-1"></i>삭제</button>
                 </div>
-                <div class="grid grid-cols-2 gap-4 text-sm mb-4">
-                    <div><span class="text-gray-500">회사/담당자:</span> <span class="text-white ml-2">(주)한국세미콘 / 김철수 대리</span></div>
-                    <div><span class="text-gray-500">연락처:</span> <span class="text-white ml-2">010-1234-5678</span></div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm mb-4 bg-black/20 p-4 rounded-lg">
+                    <div><span class="text-gray-500">회사/담당자:</span> <span class="text-white ml-2">${inq.company}</span></div>
+                    <div><span class="text-gray-500">연락처:</span> <span class="text-white ml-2">${inq.contact}</span></div>
                 </div>
-                <div class="flex items-center space-x-2 text-brand-400 text-sm cursor-pointer hover:underline">
-                    <i class="ph ph-file-pdf text-lg"></i>
-                    <span>chamber_blueprint_v2.pdf (2.4MB) 다운로드</span>
-                </div>
+                <div class="text-gray-300 text-sm whitespace-pre-wrap leading-relaxed">${inq.details}</div>
             </div>
-
-            <div class="bg-metal-800 p-6 rounded-xl border border-white/5 opacity-70">
-                <div class="flex justify-between items-start mb-4">
-                    <div>
-                        <span class="bg-gray-700 text-gray-300 text-xs px-2 py-1 rounded font-bold mr-2">답변 완료</span>
-                        <span class="text-gray-400 text-sm">2026-06-15 14:20</span>
-                        <h3 class="text-xl font-bold text-white mt-1">항공우주 브라켓 샘플 제작</h3>
-                    </div>
-                    <button class="bg-white/5 hover:bg-white/10 text-white px-3 py-1.5 rounded text-sm transition">상세 보기</button>
-                </div>
-                <div class="grid grid-cols-2 gap-4 text-sm">
-                    <div><span class="text-gray-500">회사/담당자:</span> <span class="text-white ml-2">Aero Dynamics / John Doe</span></div>
-                    <div><span class="text-gray-500">연락처:</span> <span class="text-white ml-2">john@aero.com</span></div>
-                </div>
-            </div>
+            `).join('')}
         </div>
     `;
 }
+
+window.toggleInquiryStatus = function(index) {
+    const inq = siteData.inquiries[index];
+    inq.status = inq.status === 'new' ? 'completed' : 'new';
+    saveSiteDataToFirebase();
+    renderInquiriesAdmin();
+};
+
+window.deleteInquiry = function(index) {
+    if(confirm('이 문의 내역을 정말 삭제하시겠습니까? 삭제 후 복구할 수 없습니다.')) {
+        siteData.inquiries.splice(index, 1);
+        saveSiteDataToFirebase();
+        renderInquiriesAdmin();
+    }
+};
 
 // Global Image Paste Logic
 function setupImagePaste() {

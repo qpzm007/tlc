@@ -1,4 +1,4 @@
-import { siteData, initFirebase, loadFirebaseImages } from './data.js';
+import { siteData, initFirebase, loadFirebaseImages, saveSiteDataToFirebase } from './data.js';
 
 export let currentLang = localStorage.getItem('tlc_lang') || 'ko';
 
@@ -338,21 +338,18 @@ function renderInquiry() {
                 <div class="space-y-4">
                     <div>
                         <label class="block text-sm font-medium text-gray-400 mb-1">${currentLang === 'ko' ? '회사명 / 담당자' : 'Company / Contact Person'}</label>
-                        <input type="text" class="w-full bg-metal-900 border border-white/10 rounded-md px-4 py-2 text-white focus:outline-none focus:border-brand-500">
+                        <input type="text" id="inquiry-company" class="w-full bg-metal-900 border border-white/10 rounded-md px-4 py-2 text-white focus:outline-none focus:border-brand-500">
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-400 mb-1">${currentLang === 'ko' ? '연락처 또는 이메일' : 'Contact Number or Email'}</label>
-                        <input type="text" class="w-full bg-metal-900 border border-white/10 rounded-md px-4 py-2 text-white focus:outline-none focus:border-brand-500">
+                        <input type="text" id="inquiry-contact" class="w-full bg-metal-900 border border-white/10 rounded-md px-4 py-2 text-white focus:outline-none focus:border-brand-500">
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-400 mb-1">${currentLang === 'ko' ? '문의 내용' : 'Inquiry Details'}</label>
-                        <textarea class="w-full bg-metal-900 border border-white/10 rounded-md px-4 py-2 text-white focus:outline-none focus:border-brand-500" rows="4"></textarea>
+                        <textarea id="inquiry-details" class="w-full bg-metal-900 border border-white/10 rounded-md px-4 py-2 text-white focus:outline-none focus:border-brand-500" rows="4"></textarea>
                     </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-400 mb-1">${currentLang === 'ko' ? '도면 첨부 (PDF/CAD)' : 'Attach Blueprint (PDF/CAD)'}</label>
-                        <input type="file" class="w-full bg-metal-900 border border-white/10 rounded-md px-4 py-2 text-white focus:outline-none focus:border-brand-500">
-                    </div>
-                    <button type="button" class="w-full bg-brand-600 hover:bg-brand-500 text-white font-bold py-3 px-4 rounded-md transition duration-300">
+                    <p class="text-xs text-gray-500 text-right mt-1 mb-3">${currentLang === 'ko' ? '※ 도면 첨부가 필요하신 경우, 접수 후 배정된 담당자에게 이메일로 전송해 주시기 바랍니다.' : '※ If you need to attach a blueprint, please email it to the assigned representative after submission.'}</p>
+                    <button type="button" id="submit-inquiry-btn" class="w-full bg-brand-600 hover:bg-brand-500 text-white font-bold py-3 px-4 rounded-md transition duration-300">
                         ${currentLang === 'ko' ? '문의 보내기' : 'Submit Inquiry'}
                     </button>
                 </div>
@@ -380,6 +377,55 @@ function renderInquiry() {
             </div>
         </div>
     </section>`;
+
+    const submitBtn = document.getElementById('submit-inquiry-btn');
+    if (submitBtn) {
+        submitBtn.addEventListener('click', async () => {
+            const company = document.getElementById('inquiry-company').value.trim();
+            const contact = document.getElementById('inquiry-contact').value.trim();
+            const details = document.getElementById('inquiry-details').value.trim();
+
+            if (!company || !contact || !details) {
+                alert(currentLang === 'ko' ? '모든 항목을 입력해 주세요.' : 'Please fill out all fields.');
+                return;
+            }
+
+            // Show loading state
+            const originalText = submitBtn.innerText;
+            submitBtn.innerText = currentLang === 'ko' ? '접수 중...' : 'Submitting...';
+            submitBtn.disabled = true;
+
+            const newInquiry = {
+                id: 'inq_' + Date.now(),
+                company,
+                contact,
+                details,
+                date: new Date().toLocaleString(),
+                status: 'new' // 'new' or 'completed'
+            };
+
+            try {
+                if (!siteData.inquiries) siteData.inquiries = [];
+                // Add to beginning of array
+                siteData.inquiries.unshift(newInquiry);
+                
+                await saveSiteDataToFirebase();
+                
+                alert(currentLang === 'ko' ? '성공적으로 접수되었습니다. 담당자가 확인 후 연락드리겠습니다.' : 'Successfully submitted. We will contact you shortly.');
+                
+                // Clear form
+                document.getElementById('inquiry-company').value = '';
+                document.getElementById('inquiry-contact').value = '';
+                document.getElementById('inquiry-details').value = '';
+            } catch (e) {
+                console.error(e);
+                alert(currentLang === 'ko' ? '접수 중 오류가 발생했습니다. 다시 시도해 주세요.' : 'An error occurred. Please try again.');
+            } finally {
+                submitBtn.innerText = originalText;
+                submitBtn.disabled = false;
+            }
+        });
+    }
 }
 
 export function renderFooter() {

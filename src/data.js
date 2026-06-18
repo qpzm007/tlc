@@ -41,6 +41,7 @@ export let siteData = {
     clients: [
         'GLOBAL TECH INC.', 'AEROSPACE DYNAMICS', 'PREMIUM INSTRUMENTS', 'KOREA SEMICON', 'NEXUS INNOVATION'
     ],
+    inquiries: [],
     location: {
         ko: "대전 유성구 테크노2로 14-9 (관평동 1333)",
         en: "14-9, Techno 2-ro, Yuseong-gu, Daejeon (Gwanpyeong-dong 1333)"
@@ -153,6 +154,7 @@ export async function initFirebase() {
                 company: { ...siteData.company, ...(firebaseData.company || {}) },
                 location: { ...siteData.location, ...(firebaseData.location || {}) },
                 contact: { ...siteData.contact, ...(firebaseData.contact || {}) },
+                inquiries: firebaseData.inquiries || [],
                 i18n: {
                     ko: { ...siteData.i18n.ko, ...(firebaseData.i18n?.ko || {}) },
                     en: { ...siteData.i18n.en, ...(firebaseData.i18n?.en || {}) }
@@ -166,6 +168,16 @@ export async function initFirebase() {
         }
     } catch (error) {
         console.error("Error initializing Firebase data: ", error);
+    }
+}
+
+export async function saveSiteDataToFirebase() {
+    try {
+        const docRef = doc(db, "app", "siteData");
+        await setDoc(docRef, siteData);
+    } catch (error) {
+        console.error("Error saving siteData to Firebase: ", error);
+        throw error;
     }
 }
 
