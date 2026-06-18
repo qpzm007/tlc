@@ -120,10 +120,13 @@ export function renderHeader() {
 
 function renderHero() {
     const container = document.getElementById('hero-container');
+    const defaultBg = "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80";
+    const bgUrl = siteData?.brand?.heroBgUrl || defaultBg;
+    
     container.innerHTML = `
     <section class="relative h-screen flex items-center justify-center overflow-hidden">
         <div class="absolute inset-0 z-0">
-            <img src="https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80" alt="CNC Machining Factory" class="w-full h-full object-cover opacity-30 object-center">
+            <img ${bgUrl.startsWith('img_') ? `data-img-id="${bgUrl}"` : `src="${bgUrl}"`} alt="Hero Background" class="${bgUrl.startsWith('img_') ? 'lazy-firebase-image' : ''} w-full h-full object-cover opacity-30 object-center">
             <div class="absolute inset-0 bg-gradient-to-b from-metal-900/80 via-metal-900/60 to-metal-900"></div>
         </div>
         

@@ -213,15 +213,20 @@ function renderCompanyAdmin() {
         </div>
         <div class="bg-metal-800 p-6 rounded-xl border border-white/5 space-y-6 mb-6">
             <h2 class="text-xl font-bold text-white border-b border-white/10 pb-2 mb-4">브랜드 설정</h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
                     <label class="block text-sm font-medium text-white mb-2">회사명 (브랜드)</label>
                     <input type="text" id="company-name" class="w-full bg-metal-900 border border-white/10 rounded-md px-4 py-2 text-white focus:outline-none focus:border-brand-500" value="${siteData.brand.name}">
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-white mb-2">로고 이미지 URL</label>
-                    <input type="text" id="company-logo" class="w-full bg-metal-900 border border-white/10 rounded-md px-4 py-2 text-white focus:outline-none focus:border-brand-500" value="${siteData.brand.logoUrl}" placeholder="비워두면 기본 아이콘 사용">
-                    <p class="text-xs text-gray-500 mt-1">로고 파일의 웹 주소를 입력하거나 파이어베이스 연동 후 스토리지 링크를 넣습니다.</p>
+                    <input type="text" id="company-logo" class="w-full bg-metal-900 border border-white/10 rounded-md px-4 py-2 text-white focus:outline-none focus:border-brand-500 image-upload-target" value="${siteData.brand.logoUrl}" placeholder="비워두면 기본 아이콘 사용">
+                    <p class="text-xs text-gray-500 mt-1">이미지를 복사/붙여넣기 하거나 URL을 입력하세요.</p>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-white mb-2">메인 배경 이미지 URL</label>
+                    <input type="text" id="hero-bg" class="w-full bg-metal-900 border border-white/10 rounded-md px-4 py-2 text-white focus:outline-none focus:border-brand-500 image-upload-target" value="${siteData.brand.heroBgUrl || ''}" placeholder="비워두면 기본 공장 이미지 사용">
+                    <p class="text-xs text-gray-500 mt-1">메인 화면 텍스트 뒤에 깔리는 배경 이미지입니다.</p>
                 </div>
             </div>
         </div>
@@ -294,6 +299,7 @@ function renderCompanyAdmin() {
     document.getElementById('save-company-btn').addEventListener('click', () => {
         siteData.brand.name = document.getElementById('company-name').value;
         siteData.brand.logoUrl = document.getElementById('company-logo').value;
+        siteData.brand.heroBgUrl = document.getElementById('hero-bg').value;
         siteData.company.ceoMsg.ko = document.getElementById('company-ceo-ko').value.replace(/\n/g, '<br>');
         siteData.company.ceoMsg.en = document.getElementById('company-ceo-en').value.replace(/\n/g, '<br>');
         siteData.contact.phone = document.getElementById('contact-phone').value;
