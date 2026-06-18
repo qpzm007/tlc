@@ -536,4 +536,16 @@ export function applyTranslations() {
         "Hello. I am the AI Support Assistant for Apex MCT. Ask me anything about products, equipment, or quoting procedures.";
     const chatGreeting = document.getElementById('chat-greeting');
     if (chatGreeting) chatGreeting.innerText = greeting;
+
+    // Update document title based on current page
+    const path = window.location.pathname;
+    if (path.includes('products.html')) {
+        document.title = siteData.i18n[currentLang].pageTitleProducts || 'Apex MCT';
+    } else if (path.includes('equipment.html')) {
+        document.title = siteData.i18n[currentLang].pageTitleEquipment || 'Apex MCT';
+    } else if (path.includes('certs.html')) {
+        document.title = siteData.i18n[currentLang].pageTitleCerts || 'Apex MCT';
+    } else {
+        document.title = siteData.i18n[currentLang].pageTitleMain || 'Apex MCT';
+    }
 }

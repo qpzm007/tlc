@@ -918,6 +918,7 @@ document.addEventListener('paste', async (e) => {
 function renderUITextAdmin() {
     const keys = Object.keys(siteData.i18n.ko);
     const groups = [
+        { name: "📑 탭 제목 (Browser Tab Titles)", match: key => key.startsWith('pageTitle') },
         { name: "🎯 메인 비주얼 (Hero)", match: key => key.startsWith('hero') || key.startsWith('btn') },
         { name: "🏢 회사 소개", match: key => key.startsWith('company') || key.startsWith('ceo') || key.toLowerCase().includes('cert') },
         { name: "⚙️ 제품 및 포트폴리오", match: key => key.toLowerCase().includes('product') },

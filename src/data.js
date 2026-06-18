@@ -54,6 +54,10 @@ export let siteData = {
     },
     i18n: {
         ko: {
+            pageTitleMain: "Apex MCT - 정밀 가공의 새로운 기준",
+            pageTitleProducts: "Apex MCT - 정밀 가공 포트폴리오",
+            pageTitleEquipment: "Apex MCT - 주요 설비 현황",
+            pageTitleCerts: "Apex MCT - 인증현황",
             heroBadge: "초정밀 가공의 새로운 기준",
             heroTitle: "<span class='gradient-text'>정밀함</span>이<br>예술이 되는 순간",
             heroDesc: "타협하지 않는 장인정신과 최첨단 MCT 기술. 세계 최고 수준을 요구하는 고객사의 완벽한 파트너가 됩니다.",
@@ -98,6 +102,10 @@ export let siteData = {
             chatPlaceholder: "메시지를 입력하세요..."
         },
         en: {
+            pageTitleMain: "Apex MCT - New Standard of Precision",
+            pageTitleProducts: "Apex MCT - Precision Machining Portfolio",
+            pageTitleEquipment: "Apex MCT - Main Equipment",
+            pageTitleCerts: "Apex MCT - Quality & Certifications",
             heroBadge: "New Standard of Precision",
             heroTitle: "Where <span class='gradient-text'>Precision</span><br>Becomes Art",
             heroDesc: "Uncompromising craftsmanship and cutting-edge MCT tech. The perfect partner for clients demanding world-class standards.",
