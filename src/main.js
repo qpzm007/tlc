@@ -356,7 +356,7 @@ export function renderFooter() {
             </div>
             <div class="flex items-center space-x-4">
                 <p data-i18n="footerCopyright">${siteData.i18n[currentLang].footerCopyright}</p>
-                <a href="/admin.html" class="text-brand-500 hover:text-white transition ml-4 pl-4 border-l border-white/10">Admin Login</a>
+                <a href="admin.html" class="text-brand-500 hover:text-white transition ml-4 pl-4 border-l border-white/10">Admin Login</a>
             </div>
         </div>
     </footer>`;

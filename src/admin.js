@@ -12,8 +12,17 @@ const logoutBtn = document.getElementById('logout-btn');
 const tabs = document.querySelectorAll('.admin-tab');
 const mainContent = document.getElementById('main-content');
 
+function updateBrandNameUI() {
+    const name = siteData?.brand?.name || "CMS";
+    const loginEl = document.getElementById('login-brand-name');
+    if (loginEl) loginEl.innerHTML = `${name}<span class="text-brand-500">CMS</span>`;
+    const sidebarEl = document.getElementById('sidebar-brand-name');
+    if (sidebarEl) sidebarEl.innerHTML = `${name}<span class="text-brand-500">CMS</span>`;
+}
+
 // Authentication Check (Mock logic: ID: admin, PW: admin1234)
 function checkAuth() {
+    if(siteData && siteData.brand) updateBrandNameUI();
     const isLoggedIn = sessionStorage.getItem('admin_logged_in') === 'true';
     if (isLoggedIn) {
         loginModal.classList.add('hidden');
@@ -29,6 +38,7 @@ async function saveSiteDataToFirebase() {
     try {
         const docRef = doc(db, "app", "siteData");
         await setDoc(docRef, siteData);
+        updateBrandNameUI();
         alert("성공적으로 저장되었습니다! (DB 반영 완료)");
     } catch (error) {
         console.error("Error saving data: ", error);
@@ -175,26 +185,18 @@ function renderProductsAdmin() {
         <div class="flex justify-between items-center mb-8">
             <div>
                 <h1 class="text-3xl font-bold text-white mb-2">제품 & 포트폴리오 관리</h1>
-                <p class="text-gray-400">포트폴리오 이미지는 클립보드에 복사(Ctrl+C)한 후 이곳에 붙여넣기(Ctrl+V)하여 바로 업로드할 수 있습니다.</p>
+                <p class="text-gray-400">포트폴리오 이미지는 클립보드에 복사(Ctrl+C)한 후 추가/수정 창에서 붙여넣기(Ctrl+V)하여 바로 업로드할 수 있습니다.</p>
             </div>
-            <button class="bg-brand-600 hover:bg-brand-500 text-white font-bold py-2 px-4 rounded-md transition flex items-center">
+            <button onclick="window.openProductModal()" class="bg-brand-600 hover:bg-brand-500 text-white font-bold py-2 px-4 rounded-md transition flex items-center">
                 <i class="ph ph-plus mr-2"></i> 새 제품 추가
             </button>
         </div>
         
-        <!-- Image Upload Drop/Paste Area -->
-        <div id="image-upload-area" class="border-2 border-dashed border-white/20 rounded-xl p-10 text-center mb-8 bg-metal-800 transition hover:border-brand-500 hover:bg-brand-500/5 cursor-pointer">
-            <i class="ph ph-image text-5xl text-gray-500 mb-4 inline-block"></i>
-            <p class="text-white font-medium">클릭하거나, 스크린샷을 복사(Ctrl+C)하여 이곳에서 붙여넣기(Ctrl+V) 하세요.</p>
-            <p class="text-sm text-gray-500 mt-2">Firebase Storage 연결 시 실제 업로드됩니다.</p>
-        </div>
-
-        <div class="grid grid-cols-1 gap-4">
-            ${siteData.products.map(p => `
-                <div class="bg-metal-800 p-4 rounded-lg border border-white/5 flex justify-between items-center cursor-move hover:border-white/20 transition opacity-${p.featured ? '100' : '50'}">
+        <div class="grid grid-cols-1 gap-4" id="products-list">
+            ${siteData.products.map((p, index) => `
+                <div class="bg-metal-800 p-4 rounded-lg border border-white/5 flex justify-between items-center transition opacity-${p.featured ? '100' : '50'}">
                     <div class="flex items-center">
-                        <i class="ph ph-dots-six-vertical text-gray-500 text-xl mr-4"></i>
-                        <input type="checkbox" class="mr-4 w-5 h-5 accent-brand-500 cursor-pointer" ${p.featured ? 'checked' : ''} title="메인 화면 노출">
+                        <input type="checkbox" class="prod-feature-toggle mr-4 w-5 h-5 accent-brand-500 cursor-pointer" data-index="${index}" ${p.featured ? 'checked' : ''} title="메인 화면 노출">
                         ${p.img.startsWith('http') ? `<img src="${p.img}" class="w-12 h-12 rounded object-cover mr-4">` : `<i class="ph ${p.img} text-2xl text-brand-500 mr-4"></i>`}
                         <div>
                             <h4 class="text-white font-bold">${p.ko.title} <span class="text-xs text-brand-400 font-normal ml-2">EN: ${p.en.title}</span></h4>
@@ -203,34 +205,138 @@ function renderProductsAdmin() {
                         </div>
                     </div>
                     <div class="flex space-x-2">
-                        <button class="p-2 text-gray-400 hover:text-white bg-white/5 rounded-md"><i class="ph ph-pencil-simple"></i></button>
-                        <button class="p-2 text-red-400 hover:text-red-300 bg-white/5 rounded-md"><i class="ph ph-trash"></i></button>
+                        <button onclick="window.openProductModal(${index})" class="p-2 text-gray-400 hover:text-white bg-white/5 rounded-md"><i class="ph ph-pencil-simple"></i></button>
+                        <button onclick="window.deleteProduct(${index})" class="p-2 text-red-400 hover:text-red-300 bg-white/5 rounded-md"><i class="ph ph-trash"></i></button>
                     </div>
                 </div>
             `).join('')}
         </div>
+        
+        <!-- Product Modal -->
+        <div id="product-modal" class="fixed inset-0 z-[60] hidden items-center justify-center bg-black/80 backdrop-blur-sm">
+            <div class="bg-metal-800 p-6 rounded-2xl shadow-2xl w-full max-w-2xl border border-white/10 max-h-[90vh] overflow-y-auto">
+                <h2 id="product-modal-title" class="text-2xl font-bold text-white mb-6">제품 추가</h2>
+                <input type="hidden" id="product-index" value="-1">
+                
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-white mb-1">이미지 URL (복사한 이미지 창 클릭 후 Ctrl+V 로 업로드 가능)</label>
+                        <input type="text" id="product-img" class="w-full bg-metal-900 border border-white/10 rounded-md px-4 py-2 text-white focus:outline-none focus:border-brand-500">
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-white mb-1">제품명 (KO)</label>
+                            <input type="text" id="product-title-ko" class="w-full bg-metal-900 border border-white/10 rounded-md px-4 py-2 text-white focus:outline-none focus:border-brand-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-white mb-1">제품명 (EN)</label>
+                            <input type="text" id="product-title-en" class="w-full bg-metal-900 border border-white/10 rounded-md px-4 py-2 text-white focus:outline-none focus:border-brand-500">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-white mb-1">제품 설명 (KO)</label>
+                        <textarea id="product-desc-ko" class="w-full bg-metal-900 border border-white/10 rounded-md px-4 py-2 text-white focus:outline-none focus:border-brand-500" rows="3"></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-white mb-1">제품 설명 (EN)</label>
+                        <textarea id="product-desc-en" class="w-full bg-metal-900 border border-white/10 rounded-md px-4 py-2 text-white focus:outline-none focus:border-brand-500" rows="3"></textarea>
+                    </div>
+                    <div class="flex items-center">
+                        <input type="checkbox" id="product-featured" class="w-5 h-5 accent-brand-500 cursor-pointer mr-2">
+                        <label class="text-white text-sm">메인 화면에 노출 (Featured)</label>
+                    </div>
+                </div>
+                
+                <div class="flex justify-end space-x-3 mt-8">
+                    <button onclick="document.getElementById('product-modal').classList.replace('flex', 'hidden')" class="px-6 py-2 rounded-md bg-white/10 text-white hover:bg-white/20 transition">취소</button>
+                    <button onclick="window.saveProduct()" class="px-6 py-2 rounded-md bg-brand-600 text-white hover:bg-brand-500 transition">저장</button>
+                </div>
+            </div>
+        </div>
     `;
 
-    setupImagePaste();
+    document.querySelectorAll('.prod-feature-toggle').forEach(checkbox => {
+        checkbox.addEventListener('change', (e) => {
+            const index = e.target.getAttribute('data-index');
+            siteData.products[index].featured = e.target.checked;
+            saveSiteDataToFirebase();
+            renderProductsAdmin(); // Re-render to update opacity
+        });
+    });
 }
+
+// Global functions for Products
+window.openProductModal = function(index = -1) {
+    const modal = document.getElementById('product-modal');
+    const isEdit = index >= 0;
+    document.getElementById('product-modal-title').innerText = isEdit ? '제품 수정' : '새 제품 추가';
+    document.getElementById('product-index').value = index;
+    
+    if (isEdit) {
+        const p = siteData.products[index];
+        document.getElementById('product-img').value = p.img || '';
+        document.getElementById('product-title-ko').value = p.ko.title || '';
+        document.getElementById('product-title-en').value = p.en.title || '';
+        document.getElementById('product-desc-ko').value = p.ko.desc || '';
+        document.getElementById('product-desc-en').value = p.en.desc || '';
+        document.getElementById('product-featured').checked = p.featured;
+    } else {
+        document.getElementById('product-img').value = '';
+        document.getElementById('product-title-ko').value = '';
+        document.getElementById('product-title-en').value = '';
+        document.getElementById('product-desc-ko').value = '';
+        document.getElementById('product-desc-en').value = '';
+        document.getElementById('product-featured').checked = true;
+    }
+    
+    modal.classList.replace('hidden', 'flex');
+};
+
+window.saveProduct = function() {
+    const index = parseInt(document.getElementById('product-index').value);
+    const p = {
+        id: index >= 0 ? siteData.products[index].id : 'p' + Date.now(),
+        img: document.getElementById('product-img').value,
+        featured: document.getElementById('product-featured').checked,
+        ko: {
+            title: document.getElementById('product-title-ko').value,
+            desc: document.getElementById('product-desc-ko').value
+        },
+        en: {
+            title: document.getElementById('product-title-en').value,
+            desc: document.getElementById('product-desc-en').value
+        }
+    };
+    
+    if (index >= 0) {
+        siteData.products[index] = p;
+    } else {
+        siteData.products.push(p);
+    }
+    
+    document.getElementById('product-modal').classList.replace('flex', 'hidden');
+    saveSiteDataToFirebase();
+    renderProductsAdmin();
+};
+
+window.deleteProduct = function(index) {
+    if(confirm('정말 삭제하시겠습니까?')) {
+        siteData.products.splice(index, 1);
+        saveSiteDataToFirebase();
+        renderProductsAdmin();
+    }
+};
 
 function renderEquipmentAdmin() {
     mainContent.innerHTML = `
         <div class="flex justify-between items-center mb-8">
             <div>
                 <h1 class="text-3xl font-bold text-white mb-2">설비 관리</h1>
-                <p class="text-gray-400">보유 설비를 추가하고 순서를 변경할 수 있습니다.</p>
+                <p class="text-gray-400">보유 설비를 추가하고 관리할 수 있습니다.</p>
             </div>
-            <button class="bg-brand-600 hover:bg-brand-500 text-white font-bold py-2 px-4 rounded-md transition flex items-center">
+            <button onclick="window.openEquipmentModal()" class="bg-brand-600 hover:bg-brand-500 text-white font-bold py-2 px-4 rounded-md transition flex items-center">
                 <i class="ph ph-plus mr-2"></i> 장비 추가
             </button>
-        </div>
-        
-        <!-- Image Upload Drop/Paste Area -->
-        <div id="image-upload-area" class="border-2 border-dashed border-white/20 rounded-xl p-10 text-center mb-8 bg-metal-800 transition hover:border-brand-500 hover:bg-brand-500/5 cursor-pointer">
-            <i class="ph ph-image text-5xl text-gray-500 mb-4 inline-block"></i>
-            <p class="text-white font-medium">클릭하거나, 스크린샷을 복사(Ctrl+C)하여 이곳에서 붙여넣기(Ctrl+V) 하세요.</p>
-            <p class="text-sm text-gray-500 mt-2">Firebase Storage 연결 시 실제 업로드됩니다.</p>
         </div>
 
         <div class="bg-metal-800 rounded-xl border border-white/5 overflow-hidden">
@@ -257,13 +363,55 @@ function renderEquipmentAdmin() {
                                 <div class="text-gray-500"><span class="text-xs border border-white/20 px-1 rounded mr-1 text-gray-600">EN</span>${eq.en}</div>
                             </td>
                             <td class="p-4">
-                                <button class="text-gray-500 hover:text-white mr-2"><i class="ph ph-pencil-simple text-lg"></i></button>
-                                <button class="text-gray-500 hover:text-red-400"><i class="ph ph-trash text-lg"></i></button>
+                                <button onclick="window.openEquipmentModal(${index})" class="text-gray-500 hover:text-white mr-2"><i class="ph ph-pencil-simple text-lg"></i></button>
+                                <button onclick="window.deleteEquipment(${index})" class="text-gray-500 hover:text-red-400"><i class="ph ph-trash text-lg"></i></button>
                             </td>
                         </tr>
                     `).join('')}
                 </tbody>
             </table>
+        </div>
+        
+        <!-- Equipment Modal -->
+        <div id="equipment-modal" class="fixed inset-0 z-[60] hidden items-center justify-center bg-black/80 backdrop-blur-sm">
+            <div class="bg-metal-800 p-6 rounded-2xl shadow-2xl w-full max-w-2xl border border-white/10 max-h-[90vh] overflow-y-auto">
+                <h2 id="equipment-modal-title" class="text-2xl font-bold text-white mb-6">설비 추가</h2>
+                <input type="hidden" id="eq-index" value="-1">
+                
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-white mb-1">장비 이미지 URL (Ctrl+V 로 붙여넣기 업로드 가능)</label>
+                        <input type="text" id="eq-img" class="w-full bg-metal-900 border border-white/10 rounded-md px-4 py-2 text-white focus:outline-none focus:border-brand-500">
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-white mb-1">장비명</label>
+                            <input type="text" id="eq-name" class="w-full bg-metal-900 border border-white/10 rounded-md px-4 py-2 text-white focus:outline-none focus:border-brand-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-white mb-1">모델명 및 수량 (예: X-700 / 2대)</label>
+                            <input type="text" id="eq-spec" class="w-full bg-metal-900 border border-white/10 rounded-md px-4 py-2 text-white focus:outline-none focus:border-brand-500">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-white mb-1">장비 설명 (KO)</label>
+                        <textarea id="eq-desc-ko" class="w-full bg-metal-900 border border-white/10 rounded-md px-4 py-2 text-white focus:outline-none focus:border-brand-500" rows="2"></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-white mb-1">장비 설명 (EN)</label>
+                        <textarea id="eq-desc-en" class="w-full bg-metal-900 border border-white/10 rounded-md px-4 py-2 text-white focus:outline-none focus:border-brand-500" rows="2"></textarea>
+                    </div>
+                    <div class="flex items-center">
+                        <input type="checkbox" id="eq-featured" class="w-5 h-5 accent-brand-500 cursor-pointer mr-2">
+                        <label class="text-white text-sm">메인 화면에 노출 (Featured)</label>
+                    </div>
+                </div>
+                
+                <div class="flex justify-end space-x-3 mt-8">
+                    <button onclick="document.getElementById('equipment-modal').classList.replace('flex', 'hidden')" class="px-6 py-2 rounded-md bg-white/10 text-white hover:bg-white/20 transition">취소</button>
+                    <button onclick="window.saveEquipment()" class="px-6 py-2 rounded-md bg-brand-600 text-white hover:bg-brand-500 transition">저장</button>
+                </div>
+            </div>
         </div>
     `;
 
@@ -275,30 +423,101 @@ function renderEquipmentAdmin() {
             renderEquipmentAdmin(); // Re-render to update opacity
         });
     });
-
-    setupImagePaste();
 }
+
+// Global functions for Equipment
+window.openEquipmentModal = function(index = -1) {
+    const modal = document.getElementById('equipment-modal');
+    const isEdit = index >= 0;
+    document.getElementById('equipment-modal-title').innerText = isEdit ? '설비 수정' : '새 설비 추가';
+    document.getElementById('eq-index').value = index;
+    
+    if (isEdit) {
+        const eq = siteData.equipment[index];
+        document.getElementById('eq-img').value = eq.img || '';
+        document.getElementById('eq-name').value = eq.name || '';
+        document.getElementById('eq-spec').value = eq.spec || '';
+        document.getElementById('eq-desc-ko').value = eq.ko || '';
+        document.getElementById('eq-desc-en').value = eq.en || '';
+        document.getElementById('eq-featured').checked = eq.featured;
+    } else {
+        document.getElementById('eq-img').value = '';
+        document.getElementById('eq-name').value = '';
+        document.getElementById('eq-spec').value = '';
+        document.getElementById('eq-desc-ko').value = '';
+        document.getElementById('eq-desc-en').value = '';
+        document.getElementById('eq-featured').checked = true;
+    }
+    
+    modal.classList.replace('hidden', 'flex');
+};
+
+window.saveEquipment = function() {
+    const index = parseInt(document.getElementById('eq-index').value);
+    const eq = {
+        img: document.getElementById('eq-img').value,
+        name: document.getElementById('eq-name').value,
+        spec: document.getElementById('eq-spec').value,
+        featured: document.getElementById('eq-featured').checked,
+        ko: document.getElementById('eq-desc-ko').value,
+        en: document.getElementById('eq-desc-en').value
+    };
+    
+    if (index >= 0) {
+        siteData.equipment[index] = eq;
+    } else {
+        siteData.equipment.push(eq);
+    }
+    
+    document.getElementById('equipment-modal').classList.replace('flex', 'hidden');
+    saveSiteDataToFirebase();
+    renderEquipmentAdmin();
+};
+
+window.deleteEquipment = function(index) {
+    if(confirm('정말 삭제하시겠습니까?')) {
+        siteData.equipment.splice(index, 1);
+        saveSiteDataToFirebase();
+        renderEquipmentAdmin();
+    }
+};
 
 function renderClientsAdmin() {
     mainContent.innerHTML = `
         <div class="mb-8">
             <h1 class="text-3xl font-bold text-white mb-2">고객사 로고 관리</h1>
-            <p class="text-gray-400">드래그 앤 드롭으로 로고 순서를 변경할 수 있습니다.</p>
+            <p class="text-gray-400">텍스트 기반으로 고객사 이름을 등록합니다.</p>
         </div>
-        <div class="flex flex-wrap gap-4">
-            ${siteData.clients.map(c => `
-                <div class="bg-metal-800 px-6 py-4 rounded-lg border border-white/10 text-white font-bold flex items-center cursor-move hover:border-brand-500 transition">
-                    <i class="ph ph-dots-six-vertical text-gray-500 mr-3"></i>
+        <div class="flex flex-wrap gap-4 mb-8">
+            ${siteData.clients.map((c, index) => `
+                <div class="bg-metal-800 px-6 py-4 rounded-lg border border-white/10 text-white font-bold flex items-center hover:border-brand-500 transition">
                     ${c}
-                    <button class="ml-4 text-gray-500 hover:text-red-400"><i class="ph ph-x"></i></button>
+                    <button onclick="window.deleteClient(${index})" class="ml-4 text-gray-500 hover:text-red-400"><i class="ph ph-x"></i></button>
                 </div>
             `).join('')}
-            <div class="bg-transparent px-6 py-4 rounded-lg border border-dashed border-white/20 text-gray-400 font-bold flex items-center cursor-pointer hover:border-white hover:text-white transition">
+            <div onclick="window.addClient()" class="bg-transparent px-6 py-4 rounded-lg border border-dashed border-white/20 text-gray-400 font-bold flex items-center cursor-pointer hover:border-white hover:text-white transition">
                 <i class="ph ph-plus mr-2"></i> 로고 추가
             </div>
         </div>
     `;
 }
+
+window.addClient = function() {
+    const name = prompt("고객사 이름을 입력하세요:");
+    if(name && name.trim()) {
+        siteData.clients.push(name.trim());
+        saveSiteDataToFirebase();
+        renderClientsAdmin();
+    }
+};
+
+window.deleteClient = function(index) {
+    if(confirm('삭제하시겠습니까?')) {
+        siteData.clients.splice(index, 1);
+        saveSiteDataToFirebase();
+        renderClientsAdmin();
+    }
+};
 
 function renderInquiriesAdmin() {
     mainContent.innerHTML = `
