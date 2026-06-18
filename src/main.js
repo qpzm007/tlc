@@ -1,11 +1,11 @@
 import { siteData, initFirebase, loadFirebaseImages, saveSiteDataToFirebase } from './data.js';
 
-export let currentLang = localStorage.getItem('tlc_lang') || 'ko';
+export let currentLang = 'ko';
 
 export function getLang() { return currentLang; }
 export function setLang(lang) { 
     currentLang = lang; 
-    localStorage.setItem('tlc_lang', lang);
+    localStorage.setItem('tlc_user_lang', lang);
     document.dispatchEvent(new CustomEvent('languageChanged', { detail: lang }));
 }
 
@@ -44,11 +44,11 @@ document.addEventListener('languageChanged', () => {
 
 document.addEventListener('DOMContentLoaded', async () => {
     await initFirebase();
-    if (!localStorage.getItem('tlc_lang') && siteData?.brand?.defaultLang && siteData.brand.defaultLang !== currentLang) {
-        setLang(siteData.brand.defaultLang);
-    } else {
-        init();
-    }
+    const userPref = localStorage.getItem('tlc_user_lang');
+    const defaultLang = siteData?.brand?.defaultLang || 'ko';
+    
+    currentLang = userPref || defaultLang;
+    init();
 });
 
 export function renderHeader() {
