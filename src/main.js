@@ -65,7 +65,7 @@ export function renderHeader() {
     <header class="fixed w-full z-50 glass-header transition-all duration-300" id="header">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-20">
-                <div class="flex-shrink-0 flex items-center cursor-pointer" onclick="window.scrollTo(0,0)">
+                <div class="flex-shrink-0 flex items-center cursor-pointer" onclick="window.location.href='index.html'">
                     ${siteData.brand.logoUrl ? 
                         (siteData.brand.logoUrl.startsWith('http') || siteData.brand.logoUrl.startsWith('img_') || siteData.brand.logoUrl.startsWith('data:image') ? 
                             `<img data-img-id="${siteData.brand.logoUrl}" src="${siteData.brand.logoUrl.startsWith('data:image') ? siteData.brand.logoUrl : 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs='}" alt="${siteData.brand.name} Logo" class="${siteData.brand.logoUrl.startsWith('data:image') ? '' : 'lazy-firebase-image'} h-8 mr-2">` :
