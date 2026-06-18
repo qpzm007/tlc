@@ -653,8 +653,8 @@ function renderUITextAdmin() {
     
     let rowsHTML = '';
     keys.forEach(key => {
-        const koVal = siteData.i18n.ko[key].replace(/"/g, '&quot;');
-        const enVal = siteData.i18n.en[key].replace(/"/g, '&quot;');
+        const koVal = (siteData.i18n.ko[key] || '').replace(/"/g, '&quot;');
+        const enVal = (siteData.i18n.en[key] || '').replace(/"/g, '&quot;');
         rowsHTML += `
             <div class="bg-metal-800 p-4 rounded-lg border border-white/5 mb-4">
                 <label class="block text-sm font-bold text-brand-500 mb-2">${key}</label>
