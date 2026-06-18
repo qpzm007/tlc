@@ -487,31 +487,100 @@ window.deleteEquipment = function(index) {
 
 function renderClientsAdmin() {
     mainContent.innerHTML = `
-        <div class="mb-8">
-            <h1 class="text-3xl font-bold text-white mb-2">고객사 로고 관리</h1>
-            <p class="text-gray-400">텍스트 기반으로 고객사 이름을 등록합니다.</p>
+        <div class="mb-8 flex justify-between items-center">
+            <div>
+                <h1 class="text-3xl font-bold text-white mb-2">고객사 로고 관리</h1>
+                <p class="text-gray-400">텍스트 기반 이름 또는 이미지 로고를 등록합니다.</p>
+            </div>
+            <button onclick="window.openClientModal()" class="bg-brand-600 hover:bg-brand-500 text-white font-bold py-2 px-4 rounded-md transition flex items-center">
+                <i class="ph ph-plus mr-2"></i> 새 고객사 추가
+            </button>
         </div>
         <div class="flex flex-wrap gap-4 mb-8">
-            ${siteData.clients.map((c, index) => `
-                <div class="bg-metal-800 px-6 py-4 rounded-lg border border-white/10 text-white font-bold flex items-center hover:border-brand-500 transition">
-                    ${c}
-                    <button onclick="window.deleteClient(${index})" class="ml-4 text-gray-500 hover:text-red-400"><i class="ph ph-x"></i></button>
+            ${siteData.clients.map((c, index) => {
+                const isObj = typeof c === 'object';
+                const name = isObj ? c.name : c;
+                const img = isObj ? c.img : '';
+                return `
+                <div class="bg-metal-800 px-6 py-4 rounded-lg border border-white/10 text-white font-bold flex flex-col items-center hover:border-brand-500 transition">
+                    ${img ? (img.startsWith('http') || img.startsWith('img_') ? `<img data-img-id="${img}" src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" class="lazy-firebase-image h-12 mb-3 object-contain filter grayscale hover:grayscale-0 transition">` : `<i class="ph ${img} text-4xl text-brand-500 mb-3"></i>`) : ''}
+                    <span>${name}</span>
+                    <div class="mt-4 flex space-x-2">
+                        <button onclick="window.openClientModal(${index})" class="text-gray-500 hover:text-white bg-white/5 p-1 rounded"><i class="ph ph-pencil-simple"></i></button>
+                        <button onclick="window.deleteClient(${index})" class="text-gray-500 hover:text-red-400 bg-white/5 p-1 rounded"><i class="ph ph-trash"></i></button>
+                    </div>
                 </div>
-            `).join('')}
-            <div onclick="window.addClient()" class="bg-transparent px-6 py-4 rounded-lg border border-dashed border-white/20 text-gray-400 font-bold flex items-center cursor-pointer hover:border-white hover:text-white transition">
-                <i class="ph ph-plus mr-2"></i> 로고 추가
+                `;
+            }).join('')}
+        </div>
+
+        <!-- Client Modal -->
+        <div id="client-modal" class="fixed inset-0 z-[60] hidden items-center justify-center bg-black/80 backdrop-blur-sm">
+            <div class="bg-metal-800 p-6 rounded-2xl shadow-2xl w-full max-w-lg border border-white/10">
+                <h2 id="client-modal-title" class="text-2xl font-bold text-white mb-6">고객사 추가</h2>
+                <input type="hidden" id="client-index" value="-1">
+                
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-white mb-1">고객사 이름 (필수)</label>
+                        <input type="text" id="client-name" class="w-full bg-metal-900 border border-white/10 rounded-md px-4 py-2 text-white focus:outline-none focus:border-brand-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-white mb-1">이미지 URL (복사한 이미지 창 클릭 후 Ctrl+V 가능)</label>
+                        <input type="text" id="client-img" class="w-full bg-metal-900 border border-white/10 rounded-md px-4 py-2 text-white focus:outline-none focus:border-brand-500">
+                    </div>
+                </div>
+                
+                <div class="flex justify-end space-x-3 mt-8">
+                    <button onclick="document.getElementById('client-modal').classList.replace('flex', 'hidden')" class="px-6 py-2 rounded-md bg-white/10 text-white hover:bg-white/20 transition">취소</button>
+                    <button onclick="window.saveClient()" class="px-6 py-2 rounded-md bg-brand-600 text-white hover:bg-brand-500 transition">저장</button>
+                </div>
             </div>
         </div>
     `;
+    setTimeout(() => {
+        setupImagePaste();
+        loadFirebaseImages(); // Load lazy images if any
+    }, 100);
 }
 
-window.addClient = function() {
-    const name = prompt("고객사 이름을 입력하세요:");
-    if(name && name.trim()) {
-        siteData.clients.push(name.trim());
-        saveSiteDataToFirebase();
-        renderClientsAdmin();
+window.openClientModal = function(index = -1) {
+    const modal = document.getElementById('client-modal');
+    document.getElementById('client-modal-title').innerText = index >= 0 ? '고객사 수정' : '새 고객사 추가';
+    document.getElementById('client-index').value = index;
+    
+    if (index >= 0) {
+        const c = siteData.clients[index];
+        const isObj = typeof c === 'object';
+        document.getElementById('client-name').value = isObj ? c.name : c;
+        document.getElementById('client-img').value = isObj ? (c.img || '') : '';
+    } else {
+        document.getElementById('client-name').value = '';
+        document.getElementById('client-img').value = '';
     }
+    
+    modal.classList.replace('hidden', 'flex');
+    setTimeout(() => document.getElementById('client-name').focus(), 100);
+};
+
+window.saveClient = function() {
+    const index = parseInt(document.getElementById('client-index').value);
+    const name = document.getElementById('client-name').value;
+    const img = document.getElementById('client-img').value;
+    
+    if (!name.trim()) return alert("고객사 이름을 입력하세요.");
+
+    const clientData = { name: name.trim(), img: img.trim() };
+    
+    if (index >= 0) {
+        siteData.clients[index] = clientData;
+    } else {
+        siteData.clients.push(clientData);
+    }
+    
+    document.getElementById('client-modal').classList.replace('flex', 'hidden');
+    saveSiteDataToFirebase();
+    renderClientsAdmin();
 };
 
 window.deleteClient = function(index) {

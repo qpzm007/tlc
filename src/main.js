@@ -244,18 +244,32 @@ function renderEquipment() {
 
 function renderClients() {
     const container = document.getElementById('clients-container');
-    const clientsHTML = siteData.clients.map(client => `
-        <div class="px-6 py-4 rounded-lg border border-gray-600 text-gray-400 font-bold tracking-widest hover:text-white hover:border-brand-500 transition duration-300">
-            ${client}
-        </div>
-    `).join('');
+    const clientsHTML = siteData.clients.map(client => {
+        const isObj = typeof client === 'object';
+        const name = isObj ? client.name : client;
+        const img = isObj ? client.img : '';
+        
+        if (img) {
+            return `
+            <div class="px-6 py-4 rounded-lg border border-gray-600 hover:border-brand-500 transition duration-300 flex items-center justify-center bg-white/5 h-24 w-48">
+                ${img.startsWith('http') || img.startsWith('img_') ? `<img data-img-id="${img}" src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" alt="${name}" title="${name}" class="lazy-firebase-image max-h-16 max-w-full object-contain filter grayscale hover:grayscale-0 transition duration-300">` : `<i class="ph ${img} text-4xl text-brand-500" title="${name}"></i>`}
+            </div>
+            `;
+        } else {
+            return `
+            <div class="px-6 py-4 rounded-lg border border-gray-600 text-gray-400 font-bold tracking-widest hover:text-white hover:border-brand-500 transition duration-300 flex items-center justify-center h-24 w-48 bg-metal-800 text-center">
+                ${name}
+            </div>
+            `;
+        }
+    }).join('');
 
     container.innerHTML = `
     <section id="clients" class="py-24 bg-metal-900 relative text-center">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 reveal">
             <h2 class="text-sm font-bold text-brand-500 tracking-widest uppercase mb-2" data-i18n="clientSub"></h2>
             <h3 class="text-3xl md:text-4xl font-bold text-white mb-12" data-i18n="clientTitle"></h3>
-            <div class="flex flex-wrap justify-center gap-8 items-center opacity-60">
+            <div class="flex flex-wrap justify-center gap-6 items-center">
                 ${clientsHTML}
             </div>
         </div>
@@ -264,6 +278,7 @@ function renderClients() {
 
 function renderLocation() {
     const container = document.getElementById('location-container');
+    const mapUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(siteData.location[currentLang])}`;
     container.innerHTML = `
     <section id="location" class="py-24 bg-[#0b1120] relative">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 reveal">
@@ -274,8 +289,11 @@ function renderLocation() {
             <div class="bg-metal-800 p-2 rounded-2xl border border-white/10">
                 <div class="w-full h-96 bg-metal-900 rounded-xl flex flex-col items-center justify-center text-gray-500">
                     <i class="ph ph-map-pin text-5xl text-brand-500 mb-4"></i>
-                    <p class="text-lg text-white font-medium mb-2">${siteData.location[currentLang]}</p>
-                    <p data-i18n="mapDesc"></p>
+                    <p class="text-lg text-white font-medium mb-4">${siteData.location[currentLang]}</p>
+                    <p data-i18n="mapDesc" class="mb-6"></p>
+                    <a href="${mapUrl}" target="_blank" class="bg-brand-600 hover:bg-brand-500 text-white font-bold py-3 px-6 rounded-md transition flex items-center shadow-lg shadow-brand-500/20">
+                        <i class="ph ph-map-trifold mr-2 text-xl"></i> ${currentLang === 'ko' ? '구글 지도로 보기' : 'View on Google Maps'}
+                    </a>
                 </div>
             </div>
         </div>
