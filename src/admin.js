@@ -83,6 +83,7 @@ tabs.forEach(tab => {
         const tabName = tab.getAttribute('data-tab');
         if (tabName === 'dashboard') renderDashboard();
         if (tabName === 'company') renderCompanyAdmin();
+        if (tabName === 'certs') renderCertsAdmin();
         if (tabName === 'products') renderProductsAdmin();
         if (tabName === 'equipment') renderEquipmentAdmin();
         if (tabName === 'uitext') renderUITextAdmin();
@@ -219,6 +220,144 @@ function renderCompanyAdmin() {
         saveSiteDataToFirebase();
     });
 }
+
+function renderCertsAdmin() {
+    mainContent.innerHTML = `
+        <div class="flex justify-between items-center mb-8">
+            <div>
+                <h1 class="text-3xl font-bold text-white mb-2">인증서 관리</h1>
+                <p class="text-gray-400">인증서 이미지는 클립보드에 복사(Ctrl+C)한 후 추가/수정 창에서 붙여넣기(Ctrl+V)하여 바로 업로드할 수 있습니다.</p>
+            </div>
+            <button onclick="window.openCertModal()" class="bg-brand-600 hover:bg-brand-500 text-white font-bold py-2 px-4 rounded-md transition flex items-center">
+                <i class="ph ph-plus mr-2"></i> 새 인증서 추가
+            </button>
+        </div>
+        
+        <div class="grid grid-cols-1 gap-4" id="certs-list">
+            ${siteData.company.certs.map((c, index) => `
+                <div class="bg-metal-800 p-4 rounded-lg border border-white/5 flex justify-between items-center transition opacity-${c.featured !== false ? '100' : '50'}">
+                    <div class="flex items-center">
+                        <input type="checkbox" class="cert-feature-toggle mr-4 w-5 h-5 accent-brand-500 cursor-pointer" data-index="${index}" ${c.featured !== false ? 'checked' : ''} title="메인 화면 노출">
+                        ${c.img ? (c.img.startsWith('http') || c.img.startsWith('img_') || c.img.startsWith('data:image') ? `<img data-img-id="${c.img}" src="${c.img.startsWith('data:image') ? c.img : 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs='}" class="${c.img.startsWith('data:image') ? '' : 'lazy-firebase-image'} w-12 h-12 rounded object-cover mr-4">` : `<i class="ph ${c.img} text-2xl text-brand-500 mr-4"></i>`) : `<div class="w-12 h-12 bg-metal-900 rounded flex items-center justify-center mr-4"><i class="ph ph-image text-gray-600"></i></div>`}
+                        <div>
+                            <h4 class="text-white font-bold">${c.name}</h4>
+                            <p class="text-sm text-gray-400 mb-1"><span class="text-xs border border-white/20 px-1 rounded mr-1">KO</span>${c.detail}</p>
+                            <p class="text-sm text-gray-500"><span class="text-xs border border-white/20 px-1 rounded mr-1">EN</span>${c.enDetail}</p>
+                        </div>
+                    </div>
+                    <div class="flex space-x-2">
+                        <button onclick="window.openCertModal(${index})" class="p-2 text-gray-400 hover:text-white bg-white/5 rounded-md"><i class="ph ph-pencil-simple"></i></button>
+                        <button onclick="window.deleteCert(${index})" class="p-2 text-red-400 hover:text-red-300 bg-white/5 rounded-md"><i class="ph ph-trash"></i></button>
+                    </div>
+                </div>
+            `).join('')}
+        </div>
+        
+        <!-- Cert Modal -->
+        <div id="cert-modal" class="fixed inset-0 z-[60] hidden items-center justify-center bg-black/80 backdrop-blur-sm">
+            <div class="bg-metal-800 p-6 rounded-2xl shadow-2xl w-full max-w-2xl border border-white/10 max-h-[90vh] overflow-y-auto">
+                <h2 id="cert-modal-title" class="text-2xl font-bold text-white mb-6">인증서 추가</h2>
+                <input type="hidden" id="cert-index" value="-1">
+                
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-white mb-1">인증서 이미지 URL (복사한 이미지 창 클릭 후 Ctrl+V 로 업로드 가능)</label>
+                        <input type="text" id="cert-img" class="w-full bg-metal-900 border border-white/10 rounded-md px-4 py-2 text-white focus:outline-none focus:border-brand-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-white mb-1">인증서명</label>
+                        <input type="text" id="cert-name" class="w-full bg-metal-900 border border-white/10 rounded-md px-4 py-2 text-white focus:outline-none focus:border-brand-500">
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-white mb-1">상세 설명 (KO)</label>
+                            <input type="text" id="cert-detail" class="w-full bg-metal-900 border border-white/10 rounded-md px-4 py-2 text-white focus:outline-none focus:border-brand-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-white mb-1">상세 설명 (EN)</label>
+                            <input type="text" id="cert-endetail" class="w-full bg-metal-900 border border-white/10 rounded-md px-4 py-2 text-white focus:outline-none focus:border-brand-500">
+                        </div>
+                    </div>
+                    <div class="flex items-center">
+                        <input type="checkbox" id="cert-featured" class="w-5 h-5 accent-brand-500 cursor-pointer mr-2">
+                        <label class="text-white text-sm">메인 화면에 노출 (Featured)</label>
+                    </div>
+                </div>
+                
+                <div class="flex justify-end space-x-3 mt-8">
+                    <button onclick="document.getElementById('cert-modal').classList.replace('flex', 'hidden')" class="px-6 py-2 rounded-md bg-white/10 text-white hover:bg-white/20 transition">취소</button>
+                    <button onclick="window.saveCert()" class="px-6 py-2 rounded-md bg-brand-600 text-white hover:bg-brand-500 transition">저장</button>
+                </div>
+            </div>
+        </div>
+    `;
+
+    document.querySelectorAll('.cert-feature-toggle').forEach(checkbox => {
+        checkbox.addEventListener('change', (e) => {
+            const index = e.target.getAttribute('data-index');
+            siteData.company.certs[index].featured = e.target.checked;
+            saveSiteDataToFirebase();
+            renderCertsAdmin(); // Re-render to update opacity
+        });
+    });
+
+    loadFirebaseImages();
+}
+
+// Global functions for Certs
+window.openCertModal = function(index = -1) {
+    const modal = document.getElementById('cert-modal');
+    const isEdit = index >= 0;
+    document.getElementById('cert-modal-title').innerText = isEdit ? '인증서 수정' : '새 인증서 추가';
+    document.getElementById('cert-index').value = index;
+    
+    if (isEdit) {
+        const c = siteData.company.certs[index];
+        document.getElementById('cert-img').value = c.img || '';
+        document.getElementById('cert-name').value = c.name || '';
+        document.getElementById('cert-detail').value = c.detail || '';
+        document.getElementById('cert-endetail').value = c.enDetail || '';
+        document.getElementById('cert-featured').checked = c.featured !== false;
+    } else {
+        document.getElementById('cert-img').value = '';
+        document.getElementById('cert-name').value = '';
+        document.getElementById('cert-detail').value = '';
+        document.getElementById('cert-endetail').value = '';
+        document.getElementById('cert-featured').checked = true;
+    }
+    
+    modal.classList.replace('hidden', 'flex');
+};
+
+window.saveCert = function() {
+    const index = parseInt(document.getElementById('cert-index').value);
+    const c = {
+        id: index >= 0 && siteData.company.certs[index].id ? siteData.company.certs[index].id : 'c' + Date.now(),
+        img: document.getElementById('cert-img').value,
+        name: document.getElementById('cert-name').value,
+        detail: document.getElementById('cert-detail').value,
+        enDetail: document.getElementById('cert-endetail').value,
+        featured: document.getElementById('cert-featured').checked
+    };
+    
+    if (index >= 0) {
+        siteData.company.certs[index] = c;
+    } else {
+        siteData.company.certs.push(c);
+    }
+    
+    saveSiteDataToFirebase();
+    document.getElementById('cert-modal').classList.replace('flex', 'hidden');
+    renderCertsAdmin();
+};
+
+window.deleteCert = function(index) {
+    if (confirm("정말로 이 인증서를 삭제하시겠습니까?")) {
+        siteData.company.certs.splice(index, 1);
+        saveSiteDataToFirebase();
+        renderCertsAdmin();
+    }
+};
 
 function renderProductsAdmin() {
     mainContent.innerHTML = `

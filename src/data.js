@@ -19,9 +19,9 @@ export let siteData = {
             en: "Hello, I am the CEO of Apex MCT.<br><br>Since our establishment, we have set the standard in premium precision machining through continuous technological innovation and strict quality control.<br>To meet the demanding specifications and perfect finishes required by global top-tier clients, we work with uncompromising craftsmanship that allows no room for error.<br><br>Prioritizing your trust, we promise to be your successful business partner with the highest quality and precise delivery."
         },
         certs: [
-            { name: 'ISO 9001', detail: '품질경영시스템 인증', enDetail: 'Quality Management System' },
-            { name: 'ISO 14001', detail: '환경경영시스템 인증', enDetail: 'Environmental Management System' },
-            { name: '벤처기업인증', detail: '혁신성장유형', enDetail: 'Innovative Venture Company' }
+            { id: 'c1', name: 'ISO 9001', detail: '품질경영시스템 인증', enDetail: 'Quality Management System', featured: true, img: '' },
+            { id: 'c2', name: 'ISO 14001', detail: '환경경영시스템 인증', enDetail: 'Environmental Management System', featured: true, img: '' },
+            { id: 'c3', name: '벤처기업인증', detail: '혁신성장유형', enDetail: 'Innovative Venture Company', featured: true, img: '' }
         ]
     },
     products: [

@@ -147,7 +147,9 @@ function renderHero() {
 
 function renderCompany() {
     const container = document.getElementById('company-container');
-    const certsHTML = siteData.company.certs.map(cert => `
+    const certsHTML = siteData.company.certs
+        .filter(cert => cert.featured !== false)
+        .map(cert => `
         <div class="bg-white/5 p-4 rounded-lg border border-white/10 hover:border-brand-500/50 transition">
             <div class="text-brand-500 font-bold text-lg">${cert.name}</div>
             <div class="text-sm text-gray-400 mt-1">${currentLang === 'ko' ? cert.detail : cert.enDetail}</div>
@@ -165,11 +167,16 @@ function renderCompany() {
                         ${siteData.company.ceoMsg[currentLang]}
                     </div>
                 </div>
-                <div class="bg-metal-800 p-8 rounded-2xl border border-white/5 relative overflow-hidden">
+                <div class="bg-metal-800 p-8 rounded-2xl border border-white/5 relative overflow-hidden flex flex-col h-full">
                     <div class="absolute -right-10 -top-10 text-brand-500/10"><i class="ph ph-certificate text-9xl"></i></div>
                     <h3 class="text-2xl font-bold text-white mb-6 relative z-10" data-i18n="certTitle"></h3>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 relative z-10">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 relative z-10 flex-grow mb-6">
                         ${certsHTML}
+                    </div>
+                    <div class="text-center relative z-10 mt-auto">
+                        <a href="${import.meta.env.BASE_URL}certs.html" class="inline-block w-full border border-brand-500/30 bg-metal-900 text-brand-400 hover:bg-brand-500 hover:text-white hover:border-brand-500 font-bold py-3 px-6 rounded-xl transition duration-300">
+                            <span>${currentLang === 'ko' ? '모든 인증서 보기' : 'View all certificates'}</span> <i class="ph ph-arrow-right inline-block ml-1"></i>
+                        </a>
                     </div>
                 </div>
             </div>
