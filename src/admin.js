@@ -157,8 +157,8 @@ function renderCompanyAdmin() {
                     <input type="text" id="contact-email" class="w-full bg-metal-900 border border-white/10 rounded-md px-4 py-2 text-white focus:outline-none focus:border-brand-500" value="${siteData.contact.email || ''}">
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-white mb-2">지도 퍼가기 HTML 태그 (카카오/구글맵)</label>
-                    <input type="text" id="contact-map" class="w-full bg-metal-900 border border-white/10 rounded-md px-4 py-2 text-white focus:outline-none focus:border-brand-500" value="${(siteData.contact.mapIframe || '').replace(/"/g, '&quot;')}" placeholder="<iframe src=...></iframe>">
+                    <label class="block text-sm font-medium text-white mb-2">지도 이미지 URL (복사한 이미지 창 클릭 후 Ctrl+V 가능)</label>
+                    <input type="text" id="contact-map" class="w-full bg-metal-900 border border-white/10 rounded-md px-4 py-2 text-white focus:outline-none focus:border-brand-500" value="${siteData.contact.mapImage || ''}">
                 </div>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
@@ -213,7 +213,7 @@ function renderCompanyAdmin() {
         siteData.contact.phone = document.getElementById('contact-phone').value;
         siteData.contact.fax = document.getElementById('contact-fax').value;
         siteData.contact.email = document.getElementById('contact-email').value;
-        siteData.contact.mapIframe = document.getElementById('contact-map').value;
+        siteData.contact.mapImage = document.getElementById('contact-map').value;
         siteData.location.ko = document.getElementById('location-ko').value;
         siteData.location.en = document.getElementById('location-en').value;
         saveSiteDataToFirebase();

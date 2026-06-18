@@ -49,7 +49,7 @@ export let siteData = {
         phone: "042-931-3100",
         fax: "042-931-8100",
         email: "hyolee@future-eng.com",
-        mapIframe: '<iframe src="https://map.kakao.com/?urlX=566736&urlY=807758&name=%ED%93%A8%EC%B2%98%EC%9D%B4%EC%97%94%EC%A7%80%20%EC%A3%BC&map_type=TYPE_MAP&zoom_level=3" width="100%" height="400" frameborder="0" style="border:0;" allowfullscreen="" aria-hidden="false" tabindex="0"></iframe>'
+        mapImage: ""
     },
     i18n: {
         ko: {

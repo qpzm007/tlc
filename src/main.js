@@ -278,71 +278,34 @@ function renderClients() {
 
 function renderLocation() {
     const container = document.getElementById('location-container');
+    const mapUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(siteData.location[currentLang])}`;
     
-    // Fallback if mapIframe is empty
-    const mapHTML = siteData.contact.mapIframe || `
-        <div class="w-full h-[400px] bg-metal-900 flex flex-col items-center justify-center text-gray-500">
-            <i class="ph ph-map-pin text-5xl text-brand-500 mb-4"></i>
-            <p>지도가 등록되지 않았습니다.</p>
-        </div>
-    `;
+    const mapImg = siteData.contact.mapImage;
+    const mapImageHTML = mapImg ? 
+        (mapImg.startsWith('http') || mapImg.startsWith('img_') ? 
+            `<img data-img-id="${mapImg}" src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" class="lazy-firebase-image absolute inset-0 w-full h-full object-cover opacity-50 group-hover:opacity-80 transition duration-500">` 
+            : `<i class="ph ${mapImg} text-5xl text-gray-700 absolute"></i>`) 
+        : '';
 
     container.innerHTML = `
-    <section id="location" class="py-24 bg-white relative">
+    <section id="location" class="py-24 bg-[#0b1120] relative">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 reveal">
-            <div class="text-center mb-12">
+            <div class="text-center mb-16">
                 <h2 class="text-sm font-bold text-brand-500 tracking-widest uppercase mb-2" data-i18n="locationSub"></h2>
-                <h3 class="text-3xl md:text-4xl font-bold text-black" data-i18n="locationTitle"></h3>
+                <h3 class="text-3xl md:text-4xl font-bold text-white" data-i18n="locationTitle"></h3>
             </div>
-            
-            <!-- Map Area -->
-            <div class="w-full mb-12 shadow-lg border border-gray-200 bg-gray-100">
-                ${mapHTML}
-            </div>
-
-            <!-- Contact Grid Area -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-16 max-w-4xl mx-auto border-t border-gray-200 pt-12">
-                
-                <div class="flex items-center space-x-4">
-                    <div class="p-2">
-                        <i class="ph-fill ph-map-pin text-3xl text-black"></i>
-                    </div>
-                    <div>
-                        <p class="text-lg font-bold text-black mb-1">주소</p>
-                        <p class="text-gray-600">${siteData.location[currentLang]}</p>
+            <div class="bg-metal-800 p-2 rounded-2xl border border-white/10">
+                <div class="w-full h-96 bg-metal-900 rounded-xl flex flex-col items-center justify-center text-gray-500 relative overflow-hidden group">
+                    ${mapImageHTML}
+                    <div class="z-10 bg-black/60 p-6 rounded-xl backdrop-blur-sm border border-white/10 text-center group-hover:bg-black/80 transition relative">
+                        <i class="ph ph-map-pin text-5xl text-brand-500 mb-4"></i>
+                        <p class="text-lg text-white font-medium mb-4">${siteData.location[currentLang]}</p>
+                        <p data-i18n="mapDesc" class="mb-6"></p>
+                        <a href="${mapUrl}" target="_blank" class="bg-brand-600 hover:bg-brand-500 text-white font-bold py-3 px-6 rounded-md transition inline-flex items-center shadow-lg shadow-brand-500/20">
+                            <i class="ph ph-map-trifold mr-2 text-xl"></i> ${currentLang === 'ko' ? '구글 지도로 보기' : 'View on Google Maps'}
+                        </a>
                     </div>
                 </div>
-
-                <div class="flex items-center space-x-4">
-                    <div class="p-2">
-                        <i class="ph-fill ph-printer text-3xl text-black"></i>
-                    </div>
-                    <div>
-                        <p class="text-lg font-bold text-black mb-1">팩스번호</p>
-                        <p class="text-gray-600">${siteData.contact.fax || '-'}</p>
-                    </div>
-                </div>
-
-                <div class="flex items-center space-x-4">
-                    <div class="p-2">
-                        <i class="ph-fill ph-phone text-3xl text-black"></i>
-                    </div>
-                    <div>
-                        <p class="text-lg font-bold text-black mb-1">전화번호</p>
-                        <p class="text-gray-600">${siteData.contact.phone || '-'}</p>
-                    </div>
-                </div>
-
-                <div class="flex items-center space-x-4">
-                    <div class="p-2">
-                        <i class="ph-fill ph-envelope text-3xl text-black"></i>
-                    </div>
-                    <div>
-                        <p class="text-lg font-bold text-black mb-1">이메일</p>
-                        <p class="text-gray-600">${siteData.contact.email || '-'}</p>
-                    </div>
-                </div>
-
             </div>
         </div>
     </section>`;
