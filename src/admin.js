@@ -360,7 +360,7 @@ function setupImagePaste() {
     }
 }
 
-// True Global Paste Handler for ANY Input field
+// True Global Paste Handler for ANY Input field with WebP Compression
 document.addEventListener('paste', async (e) => {
     const activeElement = document.activeElement;
     if (activeElement && activeElement.tagName === 'INPUT' && activeElement.type === 'text') {
@@ -373,15 +373,44 @@ document.addEventListener('paste', async (e) => {
                 
                 // Show uploading state
                 const originalValue = activeElement.value;
-                activeElement.value = "업로드 중...";
+                activeElement.value = "이미지 최적화 및 업로드 중...";
                 activeElement.disabled = true;
 
                 try {
-                    const fileRef = ref(storage, 'images/' + Date.now() + '_' + file.name);
-                    const snapshot = await uploadBytes(fileRef, file);
+                    // 1) Load image to Canvas for resizing & compression
+                    const img = new Image();
+                    img.src = URL.createObjectURL(file);
+                    await new Promise((resolve, reject) => {
+                        img.onload = resolve;
+                        img.onerror = reject;
+                    });
+                    
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    
+                    let width = img.width;
+                    let height = img.height;
+                    const MAX_WIDTH = 2560; // Max resolution limit
+                    if (width > MAX_WIDTH) {
+                        height = Math.round((height * MAX_WIDTH) / width);
+                        width = MAX_WIDTH;
+                    }
+                    
+                    canvas.width = width;
+                    canvas.height = height;
+                    ctx.drawImage(img, 0, 0, width, height);
+                    
+                    // 2) Export as WebP Blob
+                    const optimizedBlob = await new Promise(resolve => canvas.toBlob(resolve, 'image/webp', 0.85));
+                    
+                    // 3) Upload to Firebase Storage
+                    const fileRef = ref(storage, 'images/' + Date.now() + '.webp');
+                    const snapshot = await uploadBytes(fileRef, optimizedBlob);
                     const downloadURL = await getDownloadURL(snapshot.ref);
                     
                     activeElement.value = downloadURL;
+                    // Trigger input event to update frameworks/listeners
+                    activeElement.dispatchEvent(new Event('input', { bubbles: true }));
                 } catch (error) {
                     console.error("Upload failed", error);
                     alert("이미지 업로드에 실패했습니다. Firebase Storage가 열려있는지 확인하세요.");
@@ -393,30 +422,6 @@ document.addEventListener('paste', async (e) => {
         }
     }
 });
-    dropArea.addEventListener('dragover', (e) => {
-        e.preventDefault();
-        dropArea.classList.add('drag-over');
-    });
-    dropArea.addEventListener('dragleave', (e) => {
-        e.preventDefault();
-        dropArea.classList.remove('drag-over');
-    });
-    dropArea.addEventListener('drop', (e) => {
-        e.preventDefault();
-        dropArea.classList.remove('drag-over');
-        if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-            const blob = e.dataTransfer.files[0];
-            const reader = new FileReader();
-            reader.onload = function(event) {
-                dropArea.innerHTML = `
-                    <img src="${event.target.result}" class="h-32 mx-auto rounded mb-4" />
-                    <p class="text-brand-400 font-bold">이미지 드롭 완료! (가짜 업로드)</p>
-                `;
-            };
-            reader.readAsDataURL(blob);
-        }
-    });
-}
 
 function renderUITextAdmin() {
     const keys = Object.keys(siteData.i18n.ko);
