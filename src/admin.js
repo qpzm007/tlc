@@ -1,6 +1,7 @@
 import { siteData, initFirebase } from './data.js';
-import { db } from './firebase.js';
+import { db, storage } from './firebase.js';
 import { doc, updateDoc, setDoc } from "firebase/firestore";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
 // DOM Elements
 const loginModal = document.getElementById('login-modal');
@@ -348,26 +349,50 @@ function setupImagePaste() {
     const dropArea = document.getElementById('image-upload-area');
     if (!dropArea) return;
 
-    // Paste event
-    document.addEventListener('paste', (e) => {
+    // Drag and Drop styles
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+        dropArea.addEventListener(eventName, preventDefaults, false);
+    });
+
+    function preventDefaults(e) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+}
+
+// True Global Paste Handler for ANY Input field
+document.addEventListener('paste', async (e) => {
+    const activeElement = document.activeElement;
+    if (activeElement && activeElement.tagName === 'INPUT' && activeElement.type === 'text') {
         const items = (e.clipboardData || e.originalEvent.clipboardData).items;
         for (let index in items) {
             const item = items[index];
-            if (item.kind === 'file') {
-                const blob = item.getAsFile();
-                const reader = new FileReader();
-                reader.onload = function(event) {
-                    dropArea.innerHTML = `
-                        <img src="${event.target.result}" class="h-32 mx-auto rounded mb-4" />
-                        <p class="text-brand-400 font-bold">이미지 로드 완료! (가짜 업로드)</p>
-                    `;
-                };
-                reader.readAsDataURL(blob);
+            if (item.kind === 'file' && item.type.startsWith('image/')) {
+                e.preventDefault();
+                const file = item.getAsFile();
+                
+                // Show uploading state
+                const originalValue = activeElement.value;
+                activeElement.value = "업로드 중...";
+                activeElement.disabled = true;
+
+                try {
+                    const fileRef = ref(storage, 'images/' + Date.now() + '_' + file.name);
+                    const snapshot = await uploadBytes(fileRef, file);
+                    const downloadURL = await getDownloadURL(snapshot.ref);
+                    
+                    activeElement.value = downloadURL;
+                } catch (error) {
+                    console.error("Upload failed", error);
+                    alert("이미지 업로드에 실패했습니다. Firebase Storage가 열려있는지 확인하세요.");
+                    activeElement.value = originalValue;
+                } finally {
+                    activeElement.disabled = false;
+                }
             }
         }
-    });
-
-    // Drag and Drop styles
+    }
+});
     dropArea.addEventListener('dragover', (e) => {
         e.preventDefault();
         dropArea.classList.add('drag-over');
