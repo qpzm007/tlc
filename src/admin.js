@@ -1,7 +1,6 @@
-import { siteData, initFirebase } from './data.js';
+import { siteData, initFirebase, loadFirebaseImages } from './data.js';
 import { db, storage } from './firebase.js';
 import { doc, updateDoc, setDoc } from "firebase/firestore";
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
 // DOM Elements
 const loginModal = document.getElementById('login-modal');
@@ -197,7 +196,7 @@ function renderProductsAdmin() {
                 <div class="bg-metal-800 p-4 rounded-lg border border-white/5 flex justify-between items-center transition opacity-${p.featured ? '100' : '50'}">
                     <div class="flex items-center">
                         <input type="checkbox" class="prod-feature-toggle mr-4 w-5 h-5 accent-brand-500 cursor-pointer" data-index="${index}" ${p.featured ? 'checked' : ''} title="메인 화면 노출">
-                        ${p.img.startsWith('http') ? `<img src="${p.img}" class="w-12 h-12 rounded object-cover mr-4">` : `<i class="ph ${p.img} text-2xl text-brand-500 mr-4"></i>`}
+                        ${p.img.startsWith('http') || p.img.startsWith('img_') ? `<img data-img-id="${p.img}" src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" class="lazy-firebase-image w-12 h-12 rounded object-cover mr-4">` : `<i class="ph ${p.img} text-2xl text-brand-500 mr-4"></i>`}
                         <div>
                             <h4 class="text-white font-bold">${p.ko.title} <span class="text-xs text-brand-400 font-normal ml-2">EN: ${p.en.title}</span></h4>
                             <p class="text-sm text-gray-400 mb-1"><span class="text-xs border border-white/20 px-1 rounded mr-1">KO</span>${p.ko.desc}</p>
@@ -263,6 +262,8 @@ function renderProductsAdmin() {
             renderProductsAdmin(); // Re-render to update opacity
         });
     });
+
+    loadFirebaseImages();
 }
 
 // Global functions for Products
@@ -354,7 +355,7 @@ function renderEquipmentAdmin() {
                         <tr class="hover:bg-white/5 transition group opacity-${eq.featured ? '100' : '50'}">
                             <td class="p-4 flex items-center">
                                 <input type="checkbox" class="eq-feature-toggle mr-4 w-5 h-5 accent-brand-500 cursor-pointer" data-index="${index}" ${eq.featured ? 'checked' : ''} title="메인 화면 노출">
-                                ${eq.img ? `<img src="${eq.img}" class="w-12 h-12 rounded object-cover mr-3">` : `<div class="w-12 h-12 bg-metal-900 rounded flex items-center justify-center mr-3"><i class="ph ph-image text-gray-500"></i></div>`}
+                                ${eq.img ? `<img data-img-id="${eq.img}" src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" class="lazy-firebase-image w-12 h-12 rounded object-cover mr-3">` : `<div class="w-12 h-12 bg-metal-900 rounded flex items-center justify-center mr-3"><i class="ph ph-image text-gray-500"></i></div>`}
                                 <span class="font-bold">${eq.name}</span>
                             </td>
                             <td class="p-4 text-brand-400">${eq.spec}</td>
@@ -423,6 +424,8 @@ function renderEquipmentAdmin() {
             renderEquipmentAdmin(); // Re-render to update opacity
         });
     });
+
+    loadFirebaseImages();
 }
 
 // Global functions for Equipment
@@ -609,7 +612,7 @@ document.addEventListener('paste', async (e) => {
                     
                     let width = img.width;
                     let height = img.height;
-                    const MAX_WIDTH = 2560; // Max resolution limit
+                    const MAX_WIDTH = 1200; // Optimize for text DB limit
                     if (width > MAX_WIDTH) {
                         height = Math.round((height * MAX_WIDTH) / width);
                         width = MAX_WIDTH;
@@ -619,40 +622,23 @@ document.addEventListener('paste', async (e) => {
                     canvas.height = height;
                     ctx.drawImage(img, 0, 0, width, height);
                     
-                    // 2) Export as WebP Blob
-                    const optimizedBlob = await new Promise(resolve => canvas.toBlob(resolve, 'image/webp', 0.85));
-                    if (!optimizedBlob) throw new Error("Canvas export failed");
+                    // 2) Export as WebP Base64 String
+                    activeElement.value = "2. 데이터베이스에 업로드 중...";
+                    const base64Data = canvas.toDataURL('image/webp', 0.85);
+                    if (!base64Data || base64Data === 'data:,') throw new Error("Canvas export failed");
                     
-                    activeElement.value = "2. Firebase에 업로드 중...";
+                    // 3) Upload to Firestore 'images' collection
+                    const imgId = 'img_' + Date.now();
+                    await setDoc(doc(db, "images", imgId), { imageUrl: base64Data });
                     
-                    // 3) Upload to Firebase Storage with Timeout
-                    const fileRef = ref(storage, 'images/' + Date.now() + '.webp');
-                    
-                    // Set a 15-second timeout in case Storage is uninitialized and hangs
-                    const uploadTask = uploadBytes(fileRef, optimizedBlob);
-                    const timeoutTask = new Promise((_, reject) => 
-                        setTimeout(() => reject(new Error("Upload Timeout (Firebase Storage가 활성화되어 있지 않을 수 있습니다.)")), 15000)
-                    );
-                    
-                    const snapshot = await Promise.race([uploadTask, timeoutTask]);
-                    const downloadURL = await getDownloadURL(snapshot.ref);
-                    
-                    activeElement.value = downloadURL;
+                    activeElement.value = imgId;
                     // Trigger input event to update frameworks/listeners
                     activeElement.dispatchEvent(new Event('input', { bubbles: true }));
                 } catch (error) {
                     console.error("Upload failed", error);
                     activeElement.value = originalValue;
                     
-                    let errorMsg = "이미지 업로드에 실패했습니다.";
-                    if (error.code === 'storage/unauthorized') {
-                        errorMsg = "권한이 없습니다. Firebase Storage 규칙(Rules) 설정을 확인하세요.\\n예: allow read, write: if true;";
-                    } else if (error.message.includes('Timeout')) {
-                        errorMsg = "업로드 시간이 초과되었습니다.\\nFirebase Console에서 [Storage] 메뉴에 들어가 '시작하기'를 눌러 활성화했는지 확인하세요.";
-                    } else {
-                        errorMsg += "\\n상세: " + error.message;
-                    }
-                    alert(errorMsg);
+                    alert("이미지 업로드에 실패했습니다.\\n상세: " + error.message);
                 } finally {
                     activeElement.disabled = false;
                 }

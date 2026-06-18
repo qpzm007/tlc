@@ -1,4 +1,4 @@
-import { siteData, initFirebase } from './data.js';
+import { siteData, loadFirebaseImages } from './data.js';
 
 export let currentLang = 'ko';
 
@@ -21,6 +21,7 @@ function init() {
     renderChat();
 
     applyTranslations();
+    loadFirebaseImages();
 
     const revealObserver = new IntersectionObserver((entries, observer) => {
         entries.forEach(entry => {
@@ -181,7 +182,7 @@ function renderProducts() {
         .filter(p => p.featured)
         .map(p => `
         <div class="bg-metal-900 border border-white/10 rounded-2xl p-8 hover:border-brand-500 transition duration-300 group flex flex-col">
-            ${p.img.startsWith('http') ? `<img src="${p.img}" class="w-full h-48 object-cover rounded-xl mb-6 group-hover:scale-105 transition duration-300">` : `<i class="ph ${p.img} text-5xl text-brand-500 mb-6 group-hover:scale-110 transition duration-300 inline-block"></i>`}
+            ${p.img.startsWith('http') || p.img.startsWith('img_') ? `<img data-img-id="${p.img}" src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" class="lazy-firebase-image w-full h-48 object-cover rounded-xl mb-6 group-hover:scale-105 transition duration-300">` : `<i class="ph ${p.img} text-5xl text-brand-500 mb-6 group-hover:scale-110 transition duration-300 inline-block"></i>`}
             <h3 class="text-2xl font-bold text-white mb-4" data-ko="${p.ko.title}" data-en="${p.en.title}">${p[currentLang].title}</h3>
             <p class="text-gray-400" data-ko="${p.ko.desc}" data-en="${p.en.desc}">${p[currentLang].desc}</p>
         </div>
@@ -213,7 +214,7 @@ function renderEquipment() {
         .filter(eq => eq.featured)
         .map(eq => `
         <div class="bg-metal-800 rounded-xl overflow-hidden border border-white/10 hover:border-brand-500 transition duration-300 flex flex-col">
-            ${eq.img ? `<img src="${eq.img}" alt="${eq.name}" class="w-full h-48 object-cover">` : `<div class="w-full h-48 bg-metal-900 flex items-center justify-center"><i class="ph ph-image text-4xl text-gray-600"></i></div>`}
+            ${eq.img ? `<img data-img-id="${eq.img}" src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" alt="${eq.name}" class="lazy-firebase-image w-full h-48 object-cover">` : `<div class="w-full h-48 bg-metal-900 flex items-center justify-center"><i class="ph ph-image text-4xl text-gray-600"></i></div>`}
             <div class="p-6 flex-1 flex flex-col justify-center">
                 <h4 class="text-xl font-bold text-white mb-2">${eq.name}</h4>
                 <p class="text-brand-400 font-medium mb-3">${eq.spec}</p>

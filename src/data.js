@@ -146,3 +146,30 @@ export async function initFirebase() {
         console.error("Error initializing Firebase data: ", error);
     }
 }
+
+export const imageCache = {};
+
+export async function loadFirebaseImages() {
+    const imgs = document.querySelectorAll('.lazy-firebase-image');
+    for (let img of imgs) {
+        const imgId = img.getAttribute('data-img-id');
+        if (imgId && imgId.startsWith('img_')) {
+            if (imageCache[imgId]) {
+                img.src = imageCache[imgId];
+            } else {
+                try {
+                    const docRef = doc(db, "images", imgId);
+                    const docSnap = await getDoc(docRef);
+                    if (docSnap.exists()) {
+                        imageCache[imgId] = docSnap.data().imageUrl;
+                        img.src = imageCache[imgId];
+                    }
+                } catch(e) {
+                    console.error("Failed to load image", imgId, e);
+                }
+            }
+        } else if (imgId && imgId.startsWith('http')) {
+            img.src = imgId;
+        }
+    }
+}
