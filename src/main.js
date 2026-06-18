@@ -91,7 +91,7 @@ export function renderHeader() {
             </div>
         </div>
         <!-- Mobile menu -->
-        <div id="mobile-menu" class="hidden md:hidden bg-metal-900 border-t border-white/10 absolute w-full left-0 top-20 z-40">
+        <div id="mobile-menu" class="md:hidden bg-metal-900 border-t border-white/10 absolute w-full left-0 top-20 z-40">
             <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
                 ${mobileHTML}
             </div>
@@ -105,7 +105,7 @@ export function renderHeader() {
     const mobileMenuBtn = document.getElementById('mobile-menu-btn');
     const mobileMenu = document.getElementById('mobile-menu');
     mobileMenuBtn.addEventListener('click', () => {
-        mobileMenu.classList.toggle('hidden');
+        mobileMenu.classList.toggle('open');
     });
 
     window.addEventListener('scroll', () => {
