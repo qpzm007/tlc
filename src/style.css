@@ -1,0 +1,92 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    body {
+        @apply bg-metal-900 text-slate-50 antialiased overflow-x-hidden;
+    }
+}
+
+@layer components {
+    .glass-header {
+        background: rgba(15, 23, 42, 0.8);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    
+    .gradient-text {
+        background: linear-gradient(to right, #38bdf8, #818cf8);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+    
+    .service-card {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .service-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 30px -10px rgba(14, 165, 233, 0.3);
+        border-color: rgba(14, 165, 233, 0.5);
+    }
+}
+
+@layer utilities {
+    .reveal {
+        opacity: 0;
+        transform: translateY(30px);
+        transition: all 0.8s ease-out;
+    }
+    .reveal.active {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    /* Mobile menu transition */
+    #mobile-menu {
+        transition: max-height 0.3s ease-in-out, opacity 0.3s ease-in-out;
+        max-height: 0;
+        opacity: 0;
+        overflow: hidden;
+    }
+    #mobile-menu.open {
+        max-height: 400px;
+        opacity: 1;
+    }
+    
+    /* Chat UI Styles */
+    .chat-widget-btn:hover {
+        transform: scale(1.1);
+    }
+    .chat-window {
+        opacity: 0;
+        transform: translateY(20px) scale(0.95);
+        pointer-events: none;
+        transition: all 0.3s ease;
+        transform-origin: bottom right;
+    }
+    .chat-window.active {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+        pointer-events: auto;
+    }
+    
+    .typing-indicator span {
+        animation: blink 1.4s infinite both;
+        height: 6px;
+        width: 6px;
+        background: #cbd5e1;
+        border-radius: 50%;
+        display: inline-block;
+        margin: 0 1px;
+    }
+    .typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
+    .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
+    
+    @keyframes blink {
+        0% { opacity: 0.2; }
+        20% { opacity: 1; }
+        100% { opacity: 0.2; }
+    }
+}
