@@ -13,6 +13,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     loadFirebaseImages();
 });
 
+document.addEventListener('languageChanged', () => {
+    renderAllEquipment();
+    applyTranslations();
+});
+
 function renderAllEquipment() {
     const container = document.getElementById('all-equipment-container');
     if (!container) return;

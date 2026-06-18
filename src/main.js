@@ -1,10 +1,11 @@
 import { siteData, initFirebase, loadFirebaseImages } from './data.js';
 
-export let currentLang = 'ko';
+export let currentLang = localStorage.getItem('tlc_lang') || 'ko';
 
 export function getLang() { return currentLang; }
 export function setLang(lang) { 
     currentLang = lang; 
+    localStorage.setItem('tlc_lang', lang);
     document.dispatchEvent(new CustomEvent('languageChanged', { detail: lang }));
 }
 
