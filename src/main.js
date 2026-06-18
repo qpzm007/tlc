@@ -1,4 +1,4 @@
-import { siteData, loadFirebaseImages } from './data.js';
+import { siteData, initFirebase, loadFirebaseImages } from './data.js';
 
 export let currentLang = 'ko';
 
