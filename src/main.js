@@ -205,6 +205,7 @@ function renderCompany() {
 
 function renderProducts() {
     const container = document.getElementById('products-container');
+    if (!container) return;
     const productsHTML = siteData.products
         .filter(p => p.featured)
         .map(p => `
@@ -237,6 +238,7 @@ function renderProducts() {
 
 function renderEquipment() {
     const container = document.getElementById('equipment-container');
+    if (!container) return;
     const equipmentHTML = siteData.equipment
         .filter(eq => eq.featured)
         .map(eq => `
@@ -271,6 +273,7 @@ function renderEquipment() {
 
 function renderClients() {
     const container = document.getElementById('clients-container');
+    if (!container) return;
     const clientsHTML = siteData.clients.map(client => {
         const isObj = typeof client === 'object';
         const name = isObj ? client.name : client;
@@ -305,6 +308,7 @@ function renderClients() {
 
 function renderLocation() {
     const container = document.getElementById('location-container');
+    if (!container) return;
     const mapUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(siteData.location[currentLang])}`;
     
     const mapImg = siteData.contact.mapImage || siteData.contact.mapIframe;
@@ -343,6 +347,7 @@ function renderLocation() {
 
 function renderInquiry() {
     const container = document.getElementById('inquiry-container');
+    if (!container) return;
     container.innerHTML = `
     <section id="contact" class="py-24 bg-gradient-to-b from-metal-900 to-black">
         <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center reveal">
@@ -472,6 +477,7 @@ export function renderFooter() {
 
 function renderChat() {
     const container = document.getElementById('chat-container');
+    if (!container) return;
     container.innerHTML = `
     <div class="fixed bottom-6 right-6 z-50 flex flex-col items-end">
         <div id="ai-chat-window" class="chat-window mb-4 w-[calc(100vw-3rem)] sm:w-80 md:w-96 bg-metal-900 border border-white/10 rounded-2xl shadow-2xl overflow-hidden flex-col hidden">
