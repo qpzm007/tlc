@@ -279,7 +279,7 @@ function renderClients() {
         if (img) {
             return `
             <div class="px-6 py-4 rounded-lg border border-gray-600 hover:border-brand-500 transition duration-300 flex items-center justify-center bg-white/5 h-24 w-48">
-                ${img.startsWith('http') || img.startsWith('img_') ? `<img data-img-id="${img}" src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" alt="${name}" title="${name}" class="lazy-firebase-image max-h-16 max-w-full object-contain filter grayscale hover:grayscale-0 transition duration-300">` : `<i class="ph ${img} text-4xl text-brand-500" title="${name}"></i>`}
+                ${img.startsWith('http') || img.startsWith('img_') ? `<img data-img-id="${img}" src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" alt="${name}" title="${name}" class="lazy-firebase-image max-h-16 max-w-full object-contain transition duration-300">` : `<i class="ph ${img} text-4xl text-brand-500" title="${name}"></i>`}
             </div>
             `;
         } else {
