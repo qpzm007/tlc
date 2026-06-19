@@ -1130,7 +1130,13 @@ function renderUITextAdmin() {
 }
 
 // Initial check
-document.addEventListener('DOMContentLoaded', async () => {
+async function startAdmin() {
     await initFirebase();
     checkAuth();
-});
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', startAdmin);
+} else {
+    startAdmin();
+}

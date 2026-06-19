@@ -42,7 +42,7 @@ document.addEventListener('languageChanged', () => {
     init();
 });
 
-document.addEventListener('DOMContentLoaded', async () => {
+async function startup() {
     await initFirebase();
     const userPref = localStorage.getItem('tlc_user_lang');
     const defaultLang = siteData?.brand?.defaultLang || 'ko';
@@ -52,7 +52,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     
     // Dispatch event so subpages like products.js can safely render AFTER main.js initializes currentLang
     document.dispatchEvent(new CustomEvent('languageChanged', { detail: currentLang }));
-});
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', startup);
+} else {
+    startup();
+}
 
 export function renderHeader() {
     const container = document.getElementById('header-container');
