@@ -1129,34 +1129,46 @@ function renderUITextAdmin() {
 }
 // --- Company Details (Vision & Core Values) Admin ---
 window.renderCompanyDetailsAdmin = function() {
-    if (!siteData.company.vision) {
-        siteData.company.vision = { img: '', ko: { title: '', desc: '' }, en: { title: '', desc: '' } };
-    }
-    if (!siteData.company.coreValues) {
-        siteData.company.coreValues = [];
-    }
-    
-    const v = siteData.company.vision;
-    let cvHTML = '';
-    siteData.company.coreValues.forEach((cv, idx) => {
-        cvHTML += `
-            <div class="bg-metal-800 p-4 rounded-xl border border-white/5 flex items-center justify-between group">
-                <div class="flex items-center space-x-4">
-                    ${cv.img ? (cv.img.startsWith('http') || cv.img.startsWith('img_') || cv.img.startsWith('data:image') ? `<img data-img-id="${cv.img}" src="${cv.img.startsWith('data:image') || cv.img.startsWith('http') ? cv.img : 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs='}" class="${cv.img.startsWith('data:image') || cv.img.startsWith('http') ? '' : 'lazy-firebase-image'} w-16 h-16 object-cover rounded-md bg-metal-900">` : `<i class="ph ${cv.img} text-4xl text-brand-500"></i>`) : `<div class="w-16 h-16 bg-metal-900 rounded-md flex items-center justify-center"><i class="ph ph-image text-gray-500"></i></div>`}
-                    <div>
-                        <h4 class="text-white font-bold">${cv.ko.title} <span class="text-xs text-gray-500 font-normal">(${cv.en.title})</span></h4>
-                        <p class="text-sm text-gray-400 line-clamp-1">${cv.ko.desc}</p>
+    try {
+        if (!siteData.company.vision || Object.keys(siteData.company.vision).length === 0) {
+            siteData.company.vision = { img: '', ko: { title: '', desc: '' }, en: { title: '', desc: '' } };
+        }
+        if (!siteData.company.coreValues) {
+            siteData.company.coreValues = [];
+        }
+        
+        const v = siteData.company.vision;
+        const vImg = v.img || '';
+        const vKoTitle = v.ko?.title || '';
+        const vKoDesc = v.ko?.desc || '';
+        const vEnTitle = v.en?.title || '';
+        const vEnDesc = v.en?.desc || '';
+
+        let cvHTML = '';
+        siteData.company.coreValues.forEach((cv, idx) => {
+            const cvImg = cv.img || '';
+            const cvKoTitle = cv.ko?.title || '';
+            const cvKoDesc = cv.ko?.desc || '';
+            const cvEnTitle = cv.en?.title || '';
+            
+            cvHTML += `
+                <div class="bg-metal-800 p-4 rounded-xl border border-white/5 flex items-center justify-between group">
+                    <div class="flex items-center space-x-4">
+                        ${cvImg ? (cvImg.startsWith('http') || cvImg.startsWith('img_') || cvImg.startsWith('data:image') ? `<img data-img-id="${cvImg}" src="${cvImg.startsWith('data:image') || cvImg.startsWith('http') ? cvImg : 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs='}" class="${cvImg.startsWith('data:image') || cvImg.startsWith('http') ? '' : 'lazy-firebase-image'} w-16 h-16 object-cover rounded-md bg-metal-900">` : `<i class="ph ${cvImg} text-4xl text-brand-500"></i>`) : `<div class="w-16 h-16 bg-metal-900 rounded-md flex items-center justify-center"><i class="ph ph-image text-gray-500"></i></div>`}
+                        <div>
+                            <h4 class="text-white font-bold">${cvKoTitle} <span class="text-xs text-gray-500 font-normal">(${cvEnTitle})</span></h4>
+                            <p class="text-sm text-gray-400 line-clamp-1">${cvKoDesc}</p>
+                        </div>
+                    </div>
+                    <div class="flex space-x-2">
+                        <button onclick="window.openCoreValueModal(${idx})" class="p-2 text-gray-400 hover:text-white hover:bg-white/10 rounded transition"><i class="ph ph-pencil-simple text-xl"></i></button>
+                        <button onclick="window.deleteCoreValue(${idx})" class="p-2 text-gray-400 hover:text-red-500 hover:bg-red-500/10 rounded transition"><i class="ph ph-trash text-xl"></i></button>
                     </div>
                 </div>
-                <div class="flex space-x-2">
-                    <button onclick="window.openCoreValueModal(${idx})" class="p-2 text-gray-400 hover:text-white hover:bg-white/10 rounded transition"><i class="ph ph-pencil-simple text-xl"></i></button>
-                    <button onclick="window.deleteCoreValue(${idx})" class="p-2 text-gray-400 hover:text-red-500 hover:bg-red-500/10 rounded transition"><i class="ph ph-trash text-xl"></i></button>
-                </div>
-            </div>
-        `;
-    });
+            `;
+        });
 
-    if (cvHTML === '') cvHTML = '<p class="text-gray-500">등록된 핵심가치가 없습니다.</p>';
+        if (cvHTML === '') cvHTML = '<p class="text-gray-500">등록된 핵심가치가 없습니다.</p>';
 
     mainContent.innerHTML = `
         <div class="mb-8">
@@ -1176,7 +1188,7 @@ window.renderCompanyDetailsAdmin = function() {
                     <div>
                         <label class="block text-sm text-gray-400 mb-1">비전 배경 이미지 URL (또는 복사/붙여넣기로 업로드)</label>
                         <div class="flex gap-2">
-                            <input type="text" id="vision-img" class="flex-1 bg-metal-800 border border-white/10 rounded px-3 py-2 text-white outline-none focus:border-brand-500 paste-upload-target" value="${v.img}" placeholder="https://...">
+                            <input type="text" id="vision-img" class="flex-1 bg-metal-800 border border-white/10 rounded px-3 py-2 text-white outline-none focus:border-brand-500 paste-upload-target" value="${vImg}" placeholder="https://...">
                             <button type="button" onclick="document.getElementById('vision-img-file').click()" class="bg-metal-800 border border-white/10 px-3 rounded hover:bg-white/5"><i class="ph ph-upload-simple text-white"></i></button>
                             <input type="file" id="vision-img-file" accept="image/*" class="hidden" onchange="window.handleImageUpload(event, 'vision-img')">
                         </div>
@@ -1185,22 +1197,22 @@ window.renderCompanyDetailsAdmin = function() {
                     <div class="grid grid-cols-2 gap-4">
                         <div>
                             <label class="block text-sm text-brand-400 mb-1">비전 제목 (국문)</label>
-                            <input type="text" id="vision-title-ko" class="w-full bg-metal-800 border border-white/10 rounded px-3 py-2 text-white outline-none focus:border-brand-500" value="${v.ko.title}">
+                            <input type="text" id="vision-title-ko" class="w-full bg-metal-800 border border-white/10 rounded px-3 py-2 text-white outline-none focus:border-brand-500" value="${vKoTitle}">
                         </div>
                         <div>
                             <label class="block text-sm text-brand-400 mb-1">비전 제목 (영문)</label>
-                            <input type="text" id="vision-title-en" class="w-full bg-metal-800 border border-white/10 rounded px-3 py-2 text-white outline-none focus:border-brand-500" value="${v.en.title}">
+                            <input type="text" id="vision-title-en" class="w-full bg-metal-800 border border-white/10 rounded px-3 py-2 text-white outline-none focus:border-brand-500" value="${vEnTitle}">
                         </div>
                     </div>
 
                     <div class="grid grid-cols-2 gap-4">
                         <div>
                             <label class="block text-sm text-gray-400 mb-1">비전 상세 설명 (국문)</label>
-                            <textarea id="vision-desc-ko" class="w-full h-32 bg-metal-800 border border-white/10 rounded px-3 py-2 text-white outline-none focus:border-brand-500 resize-none">${v.ko.desc}</textarea>
+                            <textarea id="vision-desc-ko" class="w-full h-32 bg-metal-800 border border-white/10 rounded px-3 py-2 text-white outline-none focus:border-brand-500 resize-none">${vKoDesc}</textarea>
                         </div>
                         <div>
                             <label class="block text-sm text-gray-400 mb-1">비전 상세 설명 (영문)</label>
-                            <textarea id="vision-desc-en" class="w-full h-32 bg-metal-800 border border-white/10 rounded px-3 py-2 text-white outline-none focus:border-brand-500 resize-none">${v.en.desc}</textarea>
+                            <textarea id="vision-desc-en" class="w-full h-32 bg-metal-800 border border-white/10 rounded px-3 py-2 text-white outline-none focus:border-brand-500 resize-none">${vEnDesc}</textarea>
                         </div>
                     </div>
                 </div>
@@ -1270,6 +1282,10 @@ window.renderCompanyDetailsAdmin = function() {
         setupImagePaste();
         loadFirebaseImages();
     }, 100);
+    } catch (e) {
+        mainContent.innerHTML = `<div class="p-8 text-red-500 bg-red-500/10 rounded-xl"><h3>오류 발생</h3><pre>${e.stack}</pre></div>`;
+        console.error(e);
+    }
 };
 
 window.saveVision = function() {
