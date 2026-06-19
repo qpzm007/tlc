@@ -276,6 +276,26 @@ function renderCompanyAdmin() {
             </div>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                 <div>
+                    <label class="block text-sm font-medium text-white mb-2">이메일 안내 문구 (한국어)</label>
+                    <input type="text" id="contact-email-label-ko" class="w-full bg-metal-900 border border-white/10 rounded-md px-4 py-2 text-white focus:outline-none focus:border-brand-500" value="${siteData.i18n?.ko?.contactEmailLabel || '프로젝트 문의 및 도면 접수'}">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-white mb-2">이메일 안내 문구 (영문)</label>
+                    <input type="text" id="contact-email-label-en" class="w-full bg-metal-900 border border-white/10 rounded-md px-4 py-2 text-white focus:outline-none focus:border-brand-500" value="${siteData.i18n?.en?.contactEmailLabel || 'Project Inquiry & Blueprint Submission'}">
+                </div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                <div>
+                    <label class="block text-sm font-medium text-white mb-2">전화번호 안내 문구 (한국어)</label>
+                    <input type="text" id="contact-phone-label-ko" class="w-full bg-metal-900 border border-white/10 rounded-md px-4 py-2 text-white focus:outline-none focus:border-brand-500" value="${siteData.i18n?.ko?.contactPhoneLabel || '고객 지원 센터'}">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-white mb-2">전화번호 안내 문구 (영문)</label>
+                    <input type="text" id="contact-phone-label-en" class="w-full bg-metal-900 border border-white/10 rounded-md px-4 py-2 text-white focus:outline-none focus:border-brand-500" value="${siteData.i18n?.en?.contactPhoneLabel || 'Customer Support Center'}">
+                </div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                <div>
                     <label class="block text-sm font-medium text-white mb-2">주소 (한국어)</label>
                     <input type="text" id="location-ko" class="w-full bg-metal-900 border border-white/10 rounded-md px-4 py-2 text-white focus:outline-none focus:border-brand-500" value="${siteData.location.ko}">
                 </div>
@@ -329,6 +349,13 @@ function renderCompanyAdmin() {
         siteData.contact.fax = document.getElementById('contact-fax').value;
         siteData.contact.email = document.getElementById('contact-email').value;
         siteData.contact.mapImage = document.getElementById('contact-map').value;
+        
+        if (!siteData.i18n) siteData.i18n = { ko: {}, en: {} };
+        siteData.i18n.ko.contactEmailLabel = document.getElementById('contact-email-label-ko').value;
+        siteData.i18n.en.contactEmailLabel = document.getElementById('contact-email-label-en').value;
+        siteData.i18n.ko.contactPhoneLabel = document.getElementById('contact-phone-label-ko').value;
+        siteData.i18n.en.contactPhoneLabel = document.getElementById('contact-phone-label-en').value;
+
         siteData.location.ko = document.getElementById('location-ko').value;
         siteData.location.en = document.getElementById('location-en').value;
         saveSiteDataToFirebase();
