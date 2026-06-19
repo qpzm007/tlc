@@ -22,9 +22,8 @@ function updateBrandNameUI() {
 // Authentication Check
 function checkAuth() {
     if(siteData && siteData.brand) updateBrandNameUI();
-    if(siteData && siteData.i18n && siteData.i18n.ko) {
-        document.title = siteData.i18n.ko.pageTitleAdmin || "CMS Admin";
-    }
+    const brandName = siteData?.brand?.name || "";
+    document.title = brandName ? `${brandName} - CMS Admin` : "CMS Admin";
     updateInquiryBadge();
     const isLoggedIn = sessionStorage.getItem('admin_logged_in') === 'true';
     if (isLoggedIn) {
@@ -42,9 +41,8 @@ async function saveSiteDataToFirebase() {
         const docRef = doc(db, "app", "siteData");
         await setDoc(docRef, siteData);
         updateBrandNameUI();
-        if(siteData && siteData.i18n && siteData.i18n.ko) {
-            document.title = siteData.i18n.ko.pageTitleAdmin || "CMS Admin";
-        }
+        const brandName = siteData?.brand?.name || "";
+        document.title = brandName ? `${brandName} - CMS Admin` : "CMS Admin";
         alert("성공적으로 저장되었습니다! (DB 반영 완료)");
     } catch (error) {
         console.error("Error saving data: ", error);
