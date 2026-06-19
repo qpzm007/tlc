@@ -8,6 +8,10 @@ document.addEventListener('languageChanged', () => {
     loadFirebaseImages();
 });
 
+// Render immediately with default data just in case the event is missed
+renderAllCerts();
+applyTranslations();
+loadFirebaseImages();
 
 
 function renderAllCerts() {
