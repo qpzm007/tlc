@@ -91,7 +91,7 @@ tabs.forEach(tab => {
         const tabName = tab.getAttribute('data-tab');
         if (tabName === 'dashboard') renderDashboard();
         if (tabName === 'company') renderCompanyAdmin();
-        if (tabName === 'company_details') renderCompanyDetailsAdmin();
+        if (tabName === 'company_details') window.renderCompanyDetailsAdmin();
         if (tabName === 'certs') renderCertsAdmin();
         if (tabName === 'products') renderProductsAdmin();
         if (tabName === 'equipment') renderEquipmentAdmin();
@@ -1318,14 +1318,14 @@ window.saveCoreValue = function() {
     
     saveSiteDataToFirebase();
     document.getElementById('cv-modal').classList.replace('flex', 'hidden');
-    renderCompanyDetailsAdmin();
+    window.renderCompanyDetailsAdmin();
 };
 
 window.deleteCoreValue = function(index) {
     if (confirm("이 핵심가치를 삭제하시겠습니까?")) {
         siteData.company.coreValues.splice(index, 1);
         saveSiteDataToFirebase();
-        renderCompanyDetailsAdmin();
+        window.renderCompanyDetailsAdmin();
     }
 };
 
