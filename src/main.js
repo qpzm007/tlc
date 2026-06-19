@@ -134,6 +134,7 @@ export function renderHeader() {
 
 function renderHero() {
     const container = document.getElementById('hero-container');
+    if (!container) return;
     const defaultBg = "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80";
     const bgUrl = siteData?.brand?.heroBgUrl || defaultBg;
     
@@ -166,6 +167,7 @@ function renderHero() {
 
 function renderCompany() {
     const container = document.getElementById('company-container');
+    if (!container) return;
     const certsHTML = siteData.company.certs
         .filter(cert => cert.featured !== false)
         .map(cert => `
