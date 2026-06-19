@@ -35,6 +35,14 @@ function init() {
     
     setTimeout(() => {
         document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+        
+        // Handle scrolling to hash if present in URL (e.g. returning from subpages)
+        if (window.location.hash) {
+            const target = document.querySelector(window.location.hash);
+            if (target) {
+                target.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
     }, 100);
 }
 
