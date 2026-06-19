@@ -23,6 +23,16 @@ export let siteData = {
             { id: 'c1', name: 'ISO 9001', detail: '품질경영시스템 인증', enDetail: 'Quality Management System', featured: true, img: '' },
             { id: 'c2', name: 'ISO 14001', detail: '환경경영시스템 인증', enDetail: 'Environmental Management System', featured: true, img: '' },
             { id: 'c3', name: '벤처기업인증', detail: '혁신성장유형', enDetail: 'Innovative Venture Company', featured: true, img: '' }
+        ],
+        vision: {
+            img: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=1920&auto=format&fit=crop&q=80',
+            ko: { title: '세계를 움직이는 정밀함의 기준', desc: '초정밀 가공 기술을 바탕으로 글로벌 산업의 발전을 이끌며, 미래 기술의 든든한 기반이 되겠습니다.' },
+            en: { title: 'The Standard of Precision Moving the World', desc: 'Based on ultra-precision machining technology, we lead the development of global industries and become a solid foundation for future technologies.' }
+        },
+        coreValues: [
+            { id: 'cv1', img: 'https://images.unsplash.com/photo-1563720223185-11003d516935?w=500&auto=format&fit=crop&q=60', ko: { title: '완벽한 품질', desc: '마이크로 단위의 오차도 허용하지 않는 완벽주의' }, en: { title: 'Perfect Quality', desc: 'Perfectionism that does not allow micro-level errors' } },
+            { id: 'cv2', img: 'https://images.unsplash.com/photo-1581093458791-9f3c3900df4b?w=500&auto=format&fit=crop&q=60', ko: { title: '기술 혁신', desc: '끊임없는 연구 개발을 통한 첨단 가공 기술 확보' }, en: { title: 'Tech Innovation', desc: 'Securing advanced machining tech through R&D' } },
+            { id: 'cv3', img: 'https://images.unsplash.com/photo-1616422340798-8ec1f681a029?w=500&auto=format&fit=crop&q=60', ko: { title: '고객 신뢰', desc: '약속된 납기와 정확한 스펙으로 변함없는 신뢰 구축' }, en: { title: 'Client Trust', desc: 'Building trust with promised delivery and precise specs' } }
         ]
     },
     products: [

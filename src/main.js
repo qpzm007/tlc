@@ -198,9 +198,18 @@ function renderCompany() {
                 <div>
                     <h2 class="text-sm font-bold text-brand-500 tracking-widest uppercase mb-2" data-i18n="companySub"></h2>
                     <h3 class="text-3xl md:text-4xl font-bold text-white mb-6" data-i18n="ceoTitle"></h3>
-                    <div class="text-gray-300 font-light leading-relaxed space-y-4">
+                    <div class="text-gray-300 font-light leading-relaxed space-y-4 mb-8">
                         ${siteData.company.ceoMsg[currentLang]}
                     </div>
+                    ${siteData.company.vision ? `
+                    <div class="bg-brand-500/10 border-l-4 border-brand-500 p-6 rounded-r-xl mb-8">
+                        <h4 class="text-xl font-bold text-white mb-2" data-ko="${siteData.company.vision.ko.title}" data-en="${siteData.company.vision.en.title}">${siteData.company.vision[currentLang].title}</h4>
+                        <p class="text-gray-400 text-sm" data-ko="${siteData.company.vision.ko.desc}" data-en="${siteData.company.vision.en.desc}">${siteData.company.vision[currentLang].desc}</p>
+                    </div>
+                    ` : ''}
+                    <a href="${import.meta.env.BASE_URL || '/'}company.html" class="inline-flex items-center text-brand-400 font-bold hover:text-white transition duration-300">
+                        <span data-i18n="companyViewAll">회사소개 자세히 보기</span> <i class="ph ph-arrow-right ml-2 text-xl"></i>
+                    </a>
                 </div>
                 <div class="bg-metal-800 p-8 rounded-2xl border border-white/5 relative overflow-hidden flex flex-col h-full">
                     <div class="absolute -right-10 -top-10 text-brand-500/10"><i class="ph ph-certificate text-9xl"></i></div>

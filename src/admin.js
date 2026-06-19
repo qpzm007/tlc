@@ -91,6 +91,7 @@ tabs.forEach(tab => {
         const tabName = tab.getAttribute('data-tab');
         if (tabName === 'dashboard') renderDashboard();
         if (tabName === 'company') renderCompanyAdmin();
+        if (tabName === 'company_details') renderCompanyDetailsAdmin();
         if (tabName === 'certs') renderCertsAdmin();
         if (tabName === 'products') renderProductsAdmin();
         if (tabName === 'equipment') renderEquipmentAdmin();
@@ -1126,6 +1127,208 @@ function renderUITextAdmin() {
         saveSiteDataToFirebase();
     });
 }
+// --- Company Details (Vision & Core Values) Admin ---
+window.renderCompanyDetailsAdmin = function() {
+    if (!siteData.company.vision) {
+        siteData.company.vision = { img: '', ko: { title: '', desc: '' }, en: { title: '', desc: '' } };
+    }
+    if (!siteData.company.coreValues) {
+        siteData.company.coreValues = [];
+    }
+    
+    const v = siteData.company.vision;
+    let cvHTML = '';
+    siteData.company.coreValues.forEach((cv, idx) => {
+        cvHTML += `
+            <div class="bg-metal-800 p-4 rounded-xl border border-white/5 flex items-center justify-between group">
+                <div class="flex items-center space-x-4">
+                    ${cv.img ? (cv.img.startsWith('http') || cv.img.startsWith('img_') || cv.img.startsWith('data:image') ? `<img src="${cv.img.startsWith('img_') ? (imageCache[cv.img] || 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=') : cv.img}" class="w-16 h-16 object-cover rounded-md bg-metal-900">` : `<i class="ph ${cv.img} text-4xl text-brand-500"></i>`) : `<div class="w-16 h-16 bg-metal-900 rounded-md flex items-center justify-center"><i class="ph ph-image text-gray-500"></i></div>`}
+                    <div>
+                        <h4 class="text-white font-bold">${cv.ko.title} <span class="text-xs text-gray-500 font-normal">(${cv.en.title})</span></h4>
+                        <p class="text-sm text-gray-400 line-clamp-1">${cv.ko.desc}</p>
+                    </div>
+                </div>
+                <div class="flex space-x-2">
+                    <button onclick="window.openCoreValueModal(${idx})" class="p-2 text-gray-400 hover:text-white hover:bg-white/10 rounded transition"><i class="ph ph-pencil-simple text-xl"></i></button>
+                    <button onclick="window.deleteCoreValue(${idx})" class="p-2 text-gray-400 hover:text-red-500 hover:bg-red-500/10 rounded transition"><i class="ph ph-trash text-xl"></i></button>
+                </div>
+            </div>
+        `;
+    });
+
+    if (cvHTML === '') cvHTML = '<p class="text-gray-500">등록된 핵심가치가 없습니다.</p>';
+
+    mainContent.innerHTML = `
+        <div class="mb-8">
+            <h1 class="text-3xl font-bold text-white mb-2">비전 및 핵심가치 관리</h1>
+            <p class="text-gray-400">회사소개 상세 페이지에 노출되는 비전과 핵심가치를 관리합니다.</p>
+        </div>
+
+        <div class="grid grid-cols-1 xl:grid-cols-2 gap-8">
+            <!-- Vision Settings -->
+            <div class="bg-metal-900 p-6 rounded-2xl border border-white/5">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-xl font-bold text-white"><i class="ph ph-target mr-2 text-brand-500"></i> 비전 (Vision)</h2>
+                    <button onclick="window.saveVision()" class="bg-brand-600 hover:bg-brand-500 text-white px-4 py-2 rounded text-sm transition">저장</button>
+                </div>
+                
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm text-gray-400 mb-1">비전 배경 이미지 URL (또는 복사/붙여넣기로 업로드)</label>
+                        <div class="flex gap-2">
+                            <input type="text" id="vision-img" class="flex-1 bg-metal-800 border border-white/10 rounded px-3 py-2 text-white outline-none focus:border-brand-500 paste-upload-target" value="${v.img}" placeholder="https://...">
+                            <button type="button" onclick="document.getElementById('vision-img-file').click()" class="bg-metal-800 border border-white/10 px-3 rounded hover:bg-white/5"><i class="ph ph-upload-simple text-white"></i></button>
+                            <input type="file" id="vision-img-file" accept="image/*" class="hidden" onchange="window.handleImageUpload(event, 'vision-img')">
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm text-brand-400 mb-1">비전 제목 (국문)</label>
+                            <input type="text" id="vision-title-ko" class="w-full bg-metal-800 border border-white/10 rounded px-3 py-2 text-white outline-none focus:border-brand-500" value="${v.ko.title}">
+                        </div>
+                        <div>
+                            <label class="block text-sm text-brand-400 mb-1">비전 제목 (영문)</label>
+                            <input type="text" id="vision-title-en" class="w-full bg-metal-800 border border-white/10 rounded px-3 py-2 text-white outline-none focus:border-brand-500" value="${v.en.title}">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm text-gray-400 mb-1">비전 상세 설명 (국문)</label>
+                            <textarea id="vision-desc-ko" class="w-full h-32 bg-metal-800 border border-white/10 rounded px-3 py-2 text-white outline-none focus:border-brand-500 resize-none">${v.ko.desc}</textarea>
+                        </div>
+                        <div>
+                            <label class="block text-sm text-gray-400 mb-1">비전 상세 설명 (영문)</label>
+                            <textarea id="vision-desc-en" class="w-full h-32 bg-metal-800 border border-white/10 rounded px-3 py-2 text-white outline-none focus:border-brand-500 resize-none">${v.en.desc}</textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Core Values Settings -->
+            <div class="bg-metal-900 p-6 rounded-2xl border border-white/5 flex flex-col">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-xl font-bold text-white"><i class="ph ph-star mr-2 text-brand-500"></i> 핵심가치 (Core Values)</h2>
+                    <button onclick="window.openCoreValueModal(-1)" class="bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded text-sm transition"><i class="ph ph-plus"></i> 추가</button>
+                </div>
+                
+                <div class="space-y-4 flex-1 overflow-y-auto pr-2">
+                    ${cvHTML}
+                </div>
+            </div>
+        </div>
+
+        <!-- Core Value Modal -->
+        <div id="cv-modal" class="fixed inset-0 bg-black/80 z-[100] hidden items-center justify-center p-4 backdrop-blur-sm">
+            <div class="bg-metal-900 border border-white/10 rounded-2xl p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
+                <h3 class="text-2xl font-bold text-white mb-6" id="cv-modal-title">핵심가치 추가</h3>
+                <input type="hidden" id="cv-index" value="-1">
+                
+                <div class="space-y-5">
+                    <div>
+                        <label class="block text-sm text-gray-400 mb-1">이미지 URL 또는 아이콘 클래스 (예: ph-star)</label>
+                        <div class="flex gap-2">
+                            <input type="text" id="cv-img" class="flex-1 bg-metal-800 border border-white/10 rounded px-3 py-2 text-white outline-none focus:border-brand-500 paste-upload-target" placeholder="https://... 또는 ph-star">
+                            <button type="button" onclick="document.getElementById('cv-img-file').click()" class="bg-metal-800 border border-white/10 px-3 rounded hover:bg-white/5"><i class="ph ph-upload-simple text-white"></i></button>
+                            <input type="file" id="cv-img-file" accept="image/*" class="hidden" onchange="window.handleImageUpload(event, 'cv-img')">
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm text-brand-400 mb-1">제목 (국문)</label>
+                            <input type="text" id="cv-title-ko" class="w-full bg-metal-800 border border-white/10 rounded px-3 py-2 text-white outline-none focus:border-brand-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm text-brand-400 mb-1">제목 (영문)</label>
+                            <input type="text" id="cv-title-en" class="w-full bg-metal-800 border border-white/10 rounded px-3 py-2 text-white outline-none focus:border-brand-500">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm text-gray-400 mb-1">상세 설명 (국문)</label>
+                            <textarea id="cv-desc-ko" class="w-full h-24 bg-metal-800 border border-white/10 rounded px-3 py-2 text-white outline-none focus:border-brand-500 resize-none"></textarea>
+                        </div>
+                        <div>
+                            <label class="block text-sm text-gray-400 mb-1">상세 설명 (영문)</label>
+                            <textarea id="cv-desc-en" class="w-full h-24 bg-metal-800 border border-white/10 rounded px-3 py-2 text-white outline-none focus:border-brand-500 resize-none"></textarea>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="flex justify-end space-x-3 mt-8">
+                    <button onclick="document.getElementById('cv-modal').classList.replace('flex', 'hidden')" class="px-6 py-2 rounded-md bg-white/10 text-white hover:bg-white/20 transition">취소</button>
+                    <button onclick="window.saveCoreValue()" class="px-6 py-2 rounded-md bg-brand-600 text-white hover:bg-brand-500 transition">저장</button>
+                </div>
+            </div>
+        </div>
+    `;
+
+    setTimeout(() => setupImagePaste(), 100);
+};
+
+window.saveVision = function() {
+    siteData.company.vision = {
+        img: document.getElementById('vision-img').value,
+        ko: { title: document.getElementById('vision-title-ko').value, desc: document.getElementById('vision-desc-ko').value },
+        en: { title: document.getElementById('vision-title-en').value, desc: document.getElementById('vision-desc-en').value }
+    };
+    saveSiteDataToFirebase();
+    alert("비전이 저장되었습니다.");
+};
+
+window.openCoreValueModal = function(index) {
+    const modal = document.getElementById('cv-modal');
+    document.getElementById('cv-modal-title').innerText = index >= 0 ? '핵심가치 수정' : '핵심가치 추가';
+    document.getElementById('cv-index').value = index;
+    
+    if (index >= 0) {
+        const cv = siteData.company.coreValues[index];
+        document.getElementById('cv-img').value = cv.img || '';
+        document.getElementById('cv-title-ko').value = cv.ko.title || '';
+        document.getElementById('cv-title-en').value = cv.en.title || '';
+        document.getElementById('cv-desc-ko').value = cv.ko.desc || '';
+        document.getElementById('cv-desc-en').value = cv.en.desc || '';
+    } else {
+        document.getElementById('cv-img').value = '';
+        document.getElementById('cv-title-ko').value = '';
+        document.getElementById('cv-title-en').value = '';
+        document.getElementById('cv-desc-ko').value = '';
+        document.getElementById('cv-desc-en').value = '';
+    }
+    
+    modal.classList.replace('hidden', 'flex');
+};
+
+window.saveCoreValue = function() {
+    const index = parseInt(document.getElementById('cv-index').value);
+    const cvData = {
+        img: document.getElementById('cv-img').value,
+        ko: { title: document.getElementById('cv-title-ko').value, desc: document.getElementById('cv-desc-ko').value },
+        en: { title: document.getElementById('cv-title-en').value, desc: document.getElementById('cv-desc-en').value }
+    };
+    
+    if (index >= 0) {
+        siteData.company.coreValues[index] = cvData;
+    } else {
+        siteData.company.coreValues.push(cvData);
+    }
+    
+    saveSiteDataToFirebase();
+    document.getElementById('cv-modal').classList.replace('flex', 'hidden');
+    renderCompanyDetailsAdmin();
+};
+
+window.deleteCoreValue = function(index) {
+    if (confirm("이 핵심가치를 삭제하시겠습니까?")) {
+        siteData.company.coreValues.splice(index, 1);
+        saveSiteDataToFirebase();
+        renderCompanyDetailsAdmin();
+    }
+};
+
 
 // Initial check
 async function startAdmin() {

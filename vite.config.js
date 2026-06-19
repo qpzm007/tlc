@@ -10,7 +10,8 @@ export default defineConfig({
         products: resolve(__dirname, 'products.html'),
         equipment: resolve(__dirname, 'equipment.html'),
         certs: resolve(__dirname, 'certs.html'),
-        admin: resolve(__dirname, 'admin.html')
+        admin: resolve(__dirname, 'admin.html'),
+        company: resolve(__dirname, 'company.html')
       }
     }
   }

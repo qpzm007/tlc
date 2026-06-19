@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="ko" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>회사소개 상세 - ApexMCT</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800;900&family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <link rel="stylesheet" href="/src/style.css">
+</head>
+<body class="font-sans antialiased bg-black text-slate-50 flex flex-col min-h-screen">
+
+    <div id="header-container"></div>
+
+    <main class="flex-grow pt-20">
+        <!-- Hero Section -->
+        <section class="py-24 bg-metal-900 border-b border-white/5 relative overflow-hidden">
+            <div class="absolute inset-0 opacity-20 bg-[url('https://images.unsplash.com/photo-1565514020179-026b92b84bb6?w=1920&auto=format&fit=crop&q=80')] bg-cover bg-center"></div>
+            <div class="absolute inset-0 bg-gradient-to-b from-black/80 to-metal-900/90"></div>
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
+                <h1 class="text-4xl md:text-6xl lg:text-7xl font-black text-white mb-6 tracking-tight" data-i18n="companySub">회사소개</h1>
+                <p class="text-xl md:text-2xl text-brand-400 max-w-3xl mx-auto font-light tracking-wide" id="hero-vision-desc">The Standard of Precision Moving the World</p>
+            </div>
+        </section>
+
+        <!-- CEO Message Section -->
+        <section class="py-24 bg-black relative">
+            <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-16">
+                    <h2 class="text-sm font-bold text-brand-500 tracking-widest uppercase mb-4">CEO Message</h2>
+                    <h3 class="text-3xl md:text-4xl font-bold text-white mb-10" data-i18n="ceoTitle">최고의 정밀도로 보답하겠습니다.</h3>
+                    <div class="text-gray-300 text-lg md:text-xl font-light leading-relaxed space-y-6 bg-metal-900/50 p-10 md:p-16 rounded-3xl border border-white/5 shadow-2xl" id="ceo-msg-container">
+                        <!-- Injected by JS -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Vision Section -->
+        <section class="py-32 bg-metal-900 relative overflow-hidden">
+            <div class="absolute -right-40 -top-40 text-brand-500/5 rotate-12"><i class="ph ph-target text-[40rem]"></i></div>
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center" id="vision-container">
+                    <!-- Injected by JS -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Core Values Section -->
+        <section class="py-32 bg-black relative">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-20">
+                    <h2 class="text-brand-500 font-bold tracking-widest uppercase mb-2">Core Values</h2>
+                    <h3 class="text-4xl md:text-5xl font-black text-white" data-i18n="coreValuesTitle">핵심가치</h3>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8" id="core-values-container">
+                    <!-- Injected by JS -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Go to Certs Section -->
+        <section class="py-20 bg-brand-600 relative overflow-hidden">
+            <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-20"></div>
+            <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
+                <h3 class="text-3xl md:text-4xl font-bold text-white mb-8" data-i18n="certViewDesc">당사의 철저한 품질 보증 체계를 확인해보세요.</h3>
+                <a href="/certs.html" id="link-certs" class="inline-flex items-center justify-center bg-white text-brand-600 hover:bg-gray-100 font-bold py-4 px-10 rounded-full transition duration-300 shadow-xl shadow-black/20 text-lg">
+                    <span data-i18n="certViewAll">모든 인증서 보기</span>
+                    <i class="ph ph-arrow-right ml-2 text-xl"></i>
+                </a>
+            </div>
+        </section>
+
+    </main>
+
+    <div id="footer-container"></div>
+
+    <!-- Scripts -->
+    <script type="module" src="/src/company.js"></script>
+</body>
+</html>
