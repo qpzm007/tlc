@@ -133,7 +133,11 @@ export let siteData = {
             contactPhoneLabel: "고객 지원 센터",
             chatTitle: "Apex AI 기술지원",
             chatStatus: "온라인",
-            chatPlaceholder: "메시지를 입력하세요..."
+            chatPlaceholder: "메시지를 입력하세요...",
+            coreValuesTitle: "핵심가치",
+            certViewDesc: "당사의 철저한 품질 보증 체계를 확인해보세요.",
+            certViewAll: "모든 인증서 보기",
+            companyViewAll: "회사소개 자세히 보기"
         },
         en: {
             pageTitleMain: "New Standard of Precision",
@@ -178,7 +182,11 @@ export let siteData = {
             contactPhoneLabel: "Customer Support Center",
             chatTitle: "Apex AI Support",
             chatStatus: "Online",
-            chatPlaceholder: "Type a message..."
+            chatPlaceholder: "Type a message...",
+            coreValuesTitle: "Core Values",
+            certViewDesc: "Check out our thorough quality assurance system.",
+            certViewAll: "View All Certifications",
+            companyViewAll: "View Detailed Company Info"
         }
     }
 };
