@@ -512,6 +512,9 @@ function renderChat() {
     const chatToggleBtn = document.getElementById('chat-toggle-btn');
     const closeChatBtn = document.getElementById('close-chat-btn');
     const chatWindow = document.getElementById('ai-chat-window');
+    const sendChatBtn = document.getElementById('send-chat-btn');
+    const chatInput = document.getElementById('chat-input');
+    const chatMessages = document.getElementById('chat-messages');
 
     function toggleChat() {
         if (chatWindow.classList.contains('hidden')) {
@@ -527,8 +530,65 @@ function renderChat() {
         }
     }
 
+    function appendMessage(text, sender) {
+        const msgDiv = document.createElement('div');
+        msgDiv.className = `flex items-start space-x-2 ${sender === 'user' ? 'justify-end' : ''}`;
+        
+        if (sender === 'user') {
+            msgDiv.innerHTML = `
+                <div class="bg-brand-600 text-white text-sm p-3 rounded-2xl rounded-tr-none max-w-[85%] leading-relaxed">${text}</div>
+            `;
+        } else {
+            msgDiv.innerHTML = `
+                <div class="w-6 h-6 rounded-full bg-brand-500/20 flex items-center justify-center flex-shrink-0 mt-1">
+                    <i class="ph ph-robot text-xs text-brand-500"></i>
+                </div>
+                <div class="bg-metal-800 border border-white/5 text-gray-200 text-sm p-3 rounded-2xl rounded-tl-none max-w-[85%] leading-relaxed">${text}</div>
+            `;
+        }
+        
+        chatMessages.appendChild(msgDiv);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    function processChatMessage(userInput) {
+        const inputLower = userInput.toLowerCase();
+        let reply = currentLang === 'ko' 
+            ? "죄송합니다. 아직 해당 질문에는 자동으로 답변할 수 없습니다. 자세한 사항은 상단 메뉴나 하단 온라인 문의를 이용해 주세요." 
+            : "Sorry, I cannot automatically answer that question yet. Please use the top menu or the online inquiry form below for more details.";
+
+        if (siteData.chatbotRules && siteData.chatbotRules.length > 0) {
+            for (const rule of siteData.chatbotRules) {
+                if (rule.keywords.some(keyword => inputLower.includes(keyword))) {
+                    reply = rule[currentLang] || rule.ko;
+                    break;
+                }
+            }
+        }
+
+        // Show typing indicator or just delay slightly
+        setTimeout(() => {
+            appendMessage(reply, 'bot');
+        }, 600);
+    }
+
+    function handleSend() {
+        const text = chatInput.value.trim();
+        if (!text) return;
+        
+        appendMessage(text, 'user');
+        chatInput.value = '';
+        processChatMessage(text);
+    }
+
     if (chatToggleBtn) chatToggleBtn.addEventListener('click', toggleChat);
     if (closeChatBtn) closeChatBtn.addEventListener('click', toggleChat);
+    if (sendChatBtn) sendChatBtn.addEventListener('click', handleSend);
+    if (chatInput) {
+        chatInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') handleSend();
+        });
+    }
 }
 
 export function applyTranslations() {

@@ -53,6 +53,28 @@ export let siteData = {
         email: "hyolee@future-eng.com",
         mapImage: ""
     },
+    chatbotRules: [
+        {
+            keywords: ['견적', '단가', '비용', '가격', 'quote', 'price', 'cost', '비싸', '얼마'],
+            ko: "견적 및 단가 문의는 홈페이지 하단의 '온라인 견적 문의' 폼을 이용해주시면 담당자가 확인 후 신속하게 답변해 드리겠습니다.",
+            en: "For quotes and pricing, please use the 'Online Inquiry' form at the bottom of the homepage. Our representative will reply promptly."
+        },
+        {
+            keywords: ['위치', '주소', '오시는길', '찾아가는길', 'location', 'address', 'map', '어디'],
+            ko: "본사 및 공장 위치는 홈페이지 '오시는 길' 메뉴를 참조해 주세요. 카카오맵/구글맵으로 정확한 위치를 확인하실 수 있습니다.",
+            en: "Please refer to the 'Location' menu on our homepage for the headquarters and factory address. You can check the exact location via Google Maps."
+        },
+        {
+            keywords: ['인증', '품질', 'iso', 'certification', 'quality', '보증'],
+            ko: "당사는 ISO 9001, 14001 등 글로벌 스탠다드 인증을 보유하고 있습니다. '인증 현황' 메뉴에서 자세한 확인이 가능합니다.",
+            en: "We hold global standard certifications such as ISO 9001 and 14001. You can find more details in the 'Certifications' menu."
+        },
+        {
+            keywords: ['장비', '설비', '기계', 'mct', '5축', 'equipment', 'machine', '보유'],
+            ko: "당사는 최첨단 5축 가공기(DMU 50) 및 초정밀 장비를 다수 보유하고 있습니다. 상단의 '설비 현황' 메뉴를 통해 확인해 보세요.",
+            en: "We are equipped with cutting-edge 5-axis machines (DMU 50) and ultra-precision equipment. Please check the 'Equipment' menu at the top."
+        }
+    ],
     i18n: {
         ko: {
             pageTitleMain: "정밀 가공의 새로운 기준",
