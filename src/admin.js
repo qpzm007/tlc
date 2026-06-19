@@ -1142,7 +1142,7 @@ window.renderCompanyDetailsAdmin = function() {
         cvHTML += `
             <div class="bg-metal-800 p-4 rounded-xl border border-white/5 flex items-center justify-between group">
                 <div class="flex items-center space-x-4">
-                    ${cv.img ? (cv.img.startsWith('http') || cv.img.startsWith('img_') || cv.img.startsWith('data:image') ? `<img src="${cv.img.startsWith('img_') ? (imageCache[cv.img] || 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=') : cv.img}" class="w-16 h-16 object-cover rounded-md bg-metal-900">` : `<i class="ph ${cv.img} text-4xl text-brand-500"></i>`) : `<div class="w-16 h-16 bg-metal-900 rounded-md flex items-center justify-center"><i class="ph ph-image text-gray-500"></i></div>`}
+                    ${cv.img ? (cv.img.startsWith('http') || cv.img.startsWith('img_') || cv.img.startsWith('data:image') ? `<img data-img-id="${cv.img}" src="${cv.img.startsWith('data:image') || cv.img.startsWith('http') ? cv.img : 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs='}" class="${cv.img.startsWith('data:image') || cv.img.startsWith('http') ? '' : 'lazy-firebase-image'} w-16 h-16 object-cover rounded-md bg-metal-900">` : `<i class="ph ${cv.img} text-4xl text-brand-500"></i>`) : `<div class="w-16 h-16 bg-metal-900 rounded-md flex items-center justify-center"><i class="ph ph-image text-gray-500"></i></div>`}
                     <div>
                         <h4 class="text-white font-bold">${cv.ko.title} <span class="text-xs text-gray-500 font-normal">(${cv.en.title})</span></h4>
                         <p class="text-sm text-gray-400 line-clamp-1">${cv.ko.desc}</p>
@@ -1266,7 +1266,10 @@ window.renderCompanyDetailsAdmin = function() {
         </div>
     `;
 
-    setTimeout(() => setupImagePaste(), 100);
+    setTimeout(() => {
+        setupImagePaste();
+        loadFirebaseImages();
+    }, 100);
 };
 
 window.saveVision = function() {
