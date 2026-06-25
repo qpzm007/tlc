@@ -250,7 +250,19 @@ function renderCompanyAdmin() {
                     <p class="text-xs text-gray-500 mt-1">방문자가 사이트에 처음 접속했을 때 보게 될 언어입니다.</p>
                 </div>
             </div>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6 pt-6 border-t border-white/5">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6 pt-6 border-t border-white/5">
+                <div>
+                    <label class="block text-sm font-medium text-white mb-2">홈페이지 테마 설정</label>
+                    <select id="theme-preset" class="w-full bg-metal-900 border border-white/10 rounded-md px-4 py-2 text-white focus:outline-none focus:border-brand-500">
+                        <option value="default" ${siteData.brand.themePreset === 'default' ? 'selected' : ''}>기본 테마 (Midnight Navy)</option>
+                        <option value="dark" ${siteData.brand.themePreset === 'dark' ? 'selected' : ''}>시크 블랙 (Dark Charcoal)</option>
+                        <option value="light" ${siteData.brand.themePreset === 'light' ? 'selected' : ''}>소프트 라이트 (Soft Warm Light)</option>
+                        <option value="classic" ${siteData.brand.themePreset === 'classic' ? 'selected' : ''}>클래식 샌드 (Classic Warm Sand)</option>
+                        <option value="monochrome" ${siteData.brand.themePreset === 'monochrome' ? 'selected' : ''}>모던 모노크롬 (Modern Monochrome)</option>
+                        <option value="custom" ${siteData.brand.themePreset === 'custom' ? 'selected' : ''}>사용자 정의 색상 (Custom Color)</option>
+                    </select>
+                    <p class="text-xs text-gray-500 mt-1">디자이너가 큐레이션한 5가지 정밀 테마Preset입니다.</p>
+                </div>
                 <div>
                     <div class="flex justify-between items-center mb-2">
                         <label class="block text-sm font-medium text-white">메인 배경 이미지 투명도</label>
@@ -265,7 +277,7 @@ function renderCompanyAdmin() {
                         <input type="color" id="company-bg-color" class="w-10 h-10 bg-transparent border border-white/10 rounded cursor-pointer" value="${siteData.brand.bgColor || '#0f172a'}">
                         <input type="text" id="company-bg-color-hex" class="w-full bg-metal-900 border border-white/10 rounded-md px-4 py-2 text-white focus:outline-none focus:border-brand-500 uppercase text-center" value="${siteData.brand.bgColor || '#0F172A'}">
                     </div>
-                    <p class="text-xs text-gray-500 mt-1">홈페이지 전체의 기본 배경색을 변경합니다. (기본값: #0F172A)</p>
+                    <p class="text-xs text-gray-500 mt-1">테마를 '사용자 정의 색상'으로 설정 시 직접 변경할 수 있습니다.</p>
                 </div>
             </div>
         </div>
@@ -355,15 +367,44 @@ function renderCompanyAdmin() {
         </div>
     `;
 
-    // Live update for opacity slider & color picker
+    // Live update for opacity slider & color picker & theme preset
+    const themeSelect = document.getElementById('theme-preset');
     const opacitySlider = document.getElementById('hero-bg-opacity');
     const opacityVal = document.getElementById('hero-bg-opacity-val');
+    const colorPicker = document.getElementById('company-bg-color');
+    const colorHex = document.getElementById('company-bg-color-hex');
+
+    const themeColors = {
+        default: '#0F172A',
+        dark: '#121212',
+        light: '#F8FAFC',
+        classic: '#FCFAF7',
+        monochrome: '#000000'
+    };
+
+    function updateColorPickerState() {
+        const selectedTheme = themeSelect.value;
+        if (selectedTheme === 'custom') {
+            colorPicker.disabled = false;
+            colorHex.disabled = false;
+        } else {
+            colorPicker.disabled = true;
+            colorHex.disabled = true;
+            const presetColor = themeColors[selectedTheme];
+            if (presetColor) {
+                colorPicker.value = presetColor;
+                colorHex.value = presetColor;
+            }
+        }
+    }
+
+    themeSelect.addEventListener('change', updateColorPickerState);
+    updateColorPickerState(); // Init state
+
     opacitySlider.addEventListener('input', () => {
         opacityVal.textContent = opacitySlider.value + '%';
     });
 
-    const colorPicker = document.getElementById('company-bg-color');
-    const colorHex = document.getElementById('company-bg-color-hex');
     colorPicker.addEventListener('input', () => {
         colorHex.value = colorPicker.value.toUpperCase();
     });
@@ -381,6 +422,7 @@ function renderCompanyAdmin() {
         siteData.brand.defaultLang = document.getElementById('default-lang').value;
         siteData.brand.heroBgOpacity = parseInt(opacitySlider.value, 10);
         siteData.brand.bgColor = colorPicker.value;
+        siteData.brand.themePreset = themeSelect.value;
         
         siteData.company.ceoMsg.ko = document.getElementById('company-ceo-ko').value.replace(/\n/g, '<br>');
         siteData.company.ceoMsg.en = document.getElementById('company-ceo-en').value.replace(/\n/g, '<br>');

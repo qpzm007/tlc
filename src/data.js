@@ -6,7 +6,8 @@ export let siteData = {
         name: "ApexMCT",
         logoUrl: "", // Leave empty to use text + icon, or add an image URL
         heroBgOpacity: 30,
-        bgColor: "#0f172a"
+        bgColor: "#0f172a",
+        themePreset: "default"
     },
     menus: [
         { id: 'company', link: '#company', ko: '회사소개', en: 'Company' },

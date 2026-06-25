@@ -51,6 +51,7 @@ document.addEventListener('languageChanged', () => {
 });
 
 function applyDynamicColors() {
+    const themePreset = siteData?.brand?.themePreset || 'default';
     const bgColor = siteData?.brand?.bgColor || '#0f172a';
     
     function adjustColor(hex, percent) {
@@ -80,10 +81,76 @@ function applyDynamicColors() {
             return hex;
         }
     }
-    
-    const darkBg = adjustColor(bgColor, -30);
-    const lightBg = adjustColor(bgColor, 15);
-    
+
+    const themes = {
+        default: {
+            bgPrimary: '#0f172a',
+            bgSecondary: '#1e293b',
+            bgTertiary: '#030712',
+            brand: '#0ea5e9',
+            brandHover: '#0284c7',
+            textPrimary: '#ffffff',
+            textSecondary: '#94a3b8',
+            borderColor: 'rgba(255, 255, 255, 0.08)'
+        },
+        dark: {
+            bgPrimary: '#121212',
+            bgSecondary: '#1e1e1e',
+            bgTertiary: '#0a0a0a',
+            brand: '#10b981',
+            brandHover: '#059669',
+            textPrimary: '#f3f4f6',
+            textSecondary: '#9ca3af',
+            borderColor: 'rgba(255, 255, 255, 0.06)'
+        },
+        light: {
+            bgPrimary: '#f8fafc',
+            bgSecondary: '#ffffff',
+            bgTertiary: '#f1f5f9',
+            brand: '#4f46e5',
+            brandHover: '#4338ca',
+            textPrimary: '#0f172a',
+            textSecondary: '#475569',
+            borderColor: 'rgba(15, 23, 42, 0.08)'
+        },
+        classic: {
+            bgPrimary: '#fcfaf7',
+            bgSecondary: '#ffffff',
+            bgTertiary: '#f5f0eb',
+            brand: '#c2410c',
+            brandHover: '#9a3412',
+            textPrimary: '#292524',
+            textSecondary: '#57534e',
+            borderColor: 'rgba(41, 37, 36, 0.08)'
+        },
+        monochrome: {
+            bgPrimary: '#000000',
+            bgSecondary: '#121212',
+            bgTertiary: '#1a1a1a',
+            brand: '#ffffff',
+            brandHover: '#e5e7eb',
+            textPrimary: '#ffffff',
+            textSecondary: '#a3a3a3',
+            borderColor: 'rgba(255, 255, 255, 0.15)'
+        }
+    };
+
+    let palette = themes[themePreset];
+    if (!palette || themePreset === 'custom') {
+        palette = {
+            bgPrimary: bgColor,
+            bgSecondary: adjustColor(bgColor, 15),
+            bgTertiary: adjustColor(bgColor, -30),
+            brand: '#0ea5e9',
+            brandHover: '#0284c7',
+            textPrimary: '#ffffff',
+            textSecondary: '#94a3b8',
+            borderColor: 'rgba(255, 255, 255, 0.08)'
+        };
+    }
+
+    const isDarkTheme = (themePreset !== 'light' && themePreset !== 'classic');
+
     let styleTag = document.getElementById('custom-bg-style');
     if (!styleTag) {
         styleTag = document.createElement('style');
@@ -92,13 +159,73 @@ function applyDynamicColors() {
     }
     styleTag.textContent = `
         body, .bg-metal-900 {
-            background-color: ${bgColor} !important;
+            background-color: ${palette.bgPrimary} !important;
+            color: ${palette.textSecondary} !important;
+        }
+        .bg-metal-800, .bg-\\[\\#0b1120\\], .bg-metal-900\\/50 {
+            background-color: ${palette.bgSecondary} !important;
         }
         .bg-black {
-            background-color: ${darkBg} !important;
+            background-color: ${palette.bgTertiary} !important;
         }
-        .bg-metal-800, .bg-\\[\\#0b1120\\] {
-            background-color: ${lightBg} !important;
+        
+        /* Headers / Primary Text */
+        .text-white, h1, h2, h3, h4, h5, h6, .text-slate-50, .font-bold, strong {
+            color: ${palette.textPrimary} !important;
+        }
+        
+        /* Descriptions / Secondary Text */
+        .text-gray-300, .text-gray-400, .text-slate-300, .text-slate-400, .text-gray-500 {
+            color: ${palette.textSecondary} !important;
+        }
+        
+        /* Borders */
+        .border-white\\/10, .border-white\\/5, .border-white\\/20, .border-white\\/30, .border-gray-600, .border-white\\/8 {
+            border-color: ${palette.borderColor} !important;
+        }
+        
+        /* Brand color overrides */
+        .text-brand-400, .text-brand-500, .text-brand-600 {
+            color: ${palette.brand} !important;
+        }
+        .bg-brand-500, .bg-brand-600 {
+            background-color: ${palette.brand} !important;
+            color: ${isDarkTheme ? '#ffffff' : palette.bgPrimary} !important;
+        }
+        .bg-brand-500\\/10 {
+            background-color: ${palette.brand}1a !important;
+        }
+        .border-brand-500, .border-brand-500\\/30 {
+            border-color: ${palette.brand}50 !important;
+        }
+        .hover\\:bg-brand-500:hover, .hover\\:bg-brand-600:hover {
+            background-color: ${palette.brandHover} !important;
+            color: ${isDarkTheme ? '#ffffff' : palette.bgPrimary} !important;
+        }
+        .hover\\:text-brand-500:hover, .hover\\:text-white:hover {
+            color: ${palette.brand} !important;
+        }
+        
+        /* Header glass override */
+        .glass-header {
+            background: ${palette.bgPrimary}cc !important;
+            border-bottom: 1px solid ${palette.borderColor} !important;
+        }
+        
+        /* Forms & Inputs */
+        input, textarea, select {
+            background-color: ${palette.bgTertiary} !important;
+            color: ${palette.textPrimary} !important;
+            border-color: ${palette.borderColor} !important;
+        }
+        input:focus, textarea:focus, select:focus {
+            border-color: ${palette.brand} !important;
+        }
+        
+        /* Specific overrides for light backgrounds to ensure contrast */
+        .service-card:hover {
+            box-shadow: 0 10px 30px -10px ${palette.brand}40 !important;
+            border-color: ${palette.brand}80 !important;
         }
     `;
 }
