@@ -150,6 +150,7 @@ function applyDynamicColors() {
     }
 
     const isDarkTheme = (themePreset !== 'light' && themePreset !== 'classic');
+    const brandTextColor = (themePreset === 'monochrome') ? '#000000' : '#ffffff';
 
     let styleTag = document.getElementById('custom-bg-style');
     if (!styleTag) {
@@ -163,7 +164,7 @@ function applyDynamicColors() {
             background-color: ${palette.bgPrimary} !important;
             color: ${palette.textSecondary} !important;
         }
-        .bg-metal-800, .bg-\\[\\#0b1120\\], .bg-metal-900\\/50 {
+        .bg-metal-800, .bg-\\[\\#0b1120\\], .bg-metal-900\\/50, .bg-metal-800\\/50 {
             background-color: ${palette.bgSecondary} !important;
         }
         .bg-black {
@@ -183,7 +184,7 @@ function applyDynamicColors() {
             color: ${palette.brand} !important;
         }
         .bg-brand-500, .bg-brand-600, .hover\\:bg-brand-500:hover, .hover\\:bg-brand-600:hover {
-            color: #ffffff !important; /* Force high-contrast white text on brand background button/badge */
+            color: ${brandTextColor} !important; /* Force high-contrast text on brand background button/badge */
         }
         .bg-brand-500, .bg-brand-600 {
             background-color: ${palette.brand} !important;
@@ -239,8 +240,13 @@ function applyDynamicColors() {
         .bg-gradient-to-b, .bg-gradient-to-t {
             background-image: linear-gradient(to bottom, ${palette.bgPrimary}cc, ${palette.bgPrimary}a6, ${palette.bgPrimary}) !important;
         }
-        .absolute.inset-0.bg-gradient-to-b {
+        .absolute.inset-0.bg-gradient-to-b:not(.hero-overlay) {
             background: linear-gradient(to bottom, ${palette.bgPrimary}cc, ${palette.bgPrimary}a6, ${palette.bgPrimary}) !important;
+        }
+        
+        /* Hero background overlay - Make it much softer (20% to 40% opacity) so images shine through clearly */
+        .hero-overlay {
+            background: linear-gradient(to bottom, ${palette.bgPrimary}33, ${palette.bgPrimary}66, ${palette.bgPrimary}) !important;
         }
         
         /* Card Hover Effects */
@@ -360,7 +366,7 @@ function renderHero() {
     <section class="relative h-screen flex items-center justify-center overflow-hidden">
         <div class="absolute inset-0 z-0">
             <img ${bgUrl.startsWith('img_') ? `data-img-id="${bgUrl}"` : `src="${bgUrl}"`} alt="Hero Background" class="${bgUrl.startsWith('img_') ? 'lazy-firebase-image' : ''} w-full h-full object-cover object-center" style="opacity: ${opacity};">
-            <div class="absolute inset-0 bg-gradient-to-b from-metal-900/80 via-metal-900/60 to-metal-900"></div>
+            <div class="absolute inset-0 bg-gradient-to-b hero-overlay"></div>
         </div>
         
         <div class="relative z-10 text-center px-4 max-w-5xl mx-auto reveal">
