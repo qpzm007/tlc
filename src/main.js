@@ -158,6 +158,7 @@ function applyDynamicColors() {
         document.head.appendChild(styleTag);
     }
     styleTag.textContent = `
+        /* Background Overrides */
         body, .bg-metal-900 {
             background-color: ${palette.bgPrimary} !important;
             color: ${palette.textSecondary} !important;
@@ -169,28 +170,23 @@ function applyDynamicColors() {
             background-color: ${palette.bgTertiary} !important;
         }
         
-        /* Headers / Primary Text */
-        .text-white, h1, h2, h3, h4, h5, h6, .text-slate-50, .font-bold, strong {
+        /* Text Color Overrides */
+        .text-white, h1, h2, h3, h4, h5, h6, .text-slate-50, .text-slate-100, .text-slate-200, strong {
             color: ${palette.textPrimary} !important;
         }
-        
-        /* Descriptions / Secondary Text */
         .text-gray-300, .text-gray-400, .text-slate-300, .text-slate-400, .text-gray-500 {
             color: ${palette.textSecondary} !important;
         }
         
-        /* Borders */
-        .border-white\\/10, .border-white\\/5, .border-white\\/20, .border-white\\/30, .border-gray-600, .border-white\\/8 {
-            border-color: ${palette.borderColor} !important;
-        }
-        
-        /* Brand color overrides */
+        /* Brand Accent Overrides */
         .text-brand-400, .text-brand-500, .text-brand-600 {
             color: ${palette.brand} !important;
         }
+        .bg-brand-500, .bg-brand-600, .hover\\:bg-brand-500:hover, .hover\\:bg-brand-600:hover {
+            color: #ffffff !important; /* Force high-contrast white text on brand background button/badge */
+        }
         .bg-brand-500, .bg-brand-600 {
             background-color: ${palette.brand} !important;
-            color: ${isDarkTheme ? '#ffffff' : palette.bgPrimary} !important;
         }
         .bg-brand-500\\/10 {
             background-color: ${palette.brand}1a !important;
@@ -200,19 +196,36 @@ function applyDynamicColors() {
         }
         .hover\\:bg-brand-500:hover, .hover\\:bg-brand-600:hover {
             background-color: ${palette.brandHover} !important;
-            color: ${isDarkTheme ? '#ffffff' : palette.bgPrimary} !important;
         }
         .hover\\:text-brand-500:hover, .hover\\:text-white:hover {
             color: ${palette.brand} !important;
         }
         
-        /* Header glass override */
+        /* Borders */
+        .border-white\\/10, .border-white\\/5, .border-white\\/20, .border-white\\/30, .border-gray-600, .border-white\\/8 {
+            border-color: ${palette.borderColor} !important;
+        }
+        .hover\\:border-white:hover {
+            border-color: ${palette.textPrimary} !important;
+        }
+        
+        /* Glass Header & Nav Links */
         .glass-header {
             background: ${palette.bgPrimary}cc !important;
             border-bottom: 1px solid ${palette.borderColor} !important;
         }
+        .glass-header span, .glass-header a {
+            color: ${palette.textPrimary} !important;
+        }
+        .glass-header a:hover {
+            color: ${palette.brand} !important;
+        }
         
-        /* Forms & Inputs */
+        /* Forms & Containers */
+        #inquiry-form {
+            background-color: ${palette.bgSecondary} !important;
+            border-color: ${palette.borderColor} !important;
+        }
         input, textarea, select {
             background-color: ${palette.bgTertiary} !important;
             color: ${palette.textPrimary} !important;
@@ -222,7 +235,15 @@ function applyDynamicColors() {
             border-color: ${palette.brand} !important;
         }
         
-        /* Specific overrides for light backgrounds to ensure contrast */
+        /* Gradient overlays - Invert or tint based on theme bgPrimary */
+        .bg-gradient-to-b, .bg-gradient-to-t {
+            background-image: linear-gradient(to bottom, ${palette.bgPrimary}cc, ${palette.bgPrimary}a6, ${palette.bgPrimary}) !important;
+        }
+        .absolute.inset-0.bg-gradient-to-b {
+            background: linear-gradient(to bottom, ${palette.bgPrimary}cc, ${palette.bgPrimary}a6, ${palette.bgPrimary}) !important;
+        }
+        
+        /* Card Hover Effects */
         .service-card:hover {
             box-shadow: 0 10px 30px -10px ${palette.brand}40 !important;
             border-color: ${palette.brand}80 !important;
