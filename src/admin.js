@@ -259,9 +259,13 @@ function renderCompanyAdmin() {
                         <option value="light" ${siteData.brand.themePreset === 'light' ? 'selected' : ''}>소프트 라이트 (Soft Warm Light)</option>
                         <option value="classic" ${siteData.brand.themePreset === 'classic' ? 'selected' : ''}>클래식 샌드 (Classic Warm Sand)</option>
                         <option value="monochrome" ${siteData.brand.themePreset === 'monochrome' ? 'selected' : ''}>모던 모노크롬 (Modern Monochrome)</option>
+                        <option value="spring" ${siteData.brand.themePreset === 'spring' ? 'selected' : ''}>🌸 봄의 아지랑이 (Spring Apricot)</option>
+                        <option value="summer" ${siteData.brand.themePreset === 'summer' ? 'selected' : ''}>🌊 청량한 여름 (Summer Ocean)</option>
+                        <option value="autumn" ${siteData.brand.themePreset === 'autumn' ? 'selected' : ''}>🍁 단풍빛 가을 (Autumn Amber)</option>
+                        <option value="winter" ${siteData.brand.themePreset === 'winter' ? 'selected' : ''}>❄️ 백설의 겨울 (Winter Ice)</option>
                         <option value="custom" ${siteData.brand.themePreset === 'custom' ? 'selected' : ''}>사용자 정의 색상 (Custom Color)</option>
                     </select>
-                    <p class="text-xs text-gray-500 mt-1">디자이너가 큐레이션한 5가지 정밀 테마Preset입니다.</p>
+                    <p class="text-xs text-gray-500 mt-1">디자이너가 큐레이션한 프리미엄 테마 프리셋입니다.</p>
                 </div>
                 <div>
                     <div class="flex justify-between items-center mb-2">
@@ -379,7 +383,11 @@ function renderCompanyAdmin() {
         dark: '#121212',
         light: '#F8FAFC',
         classic: '#FCFAF7',
-        monochrome: '#000000'
+        monochrome: '#000000',
+        spring: '#FFFCF9',
+        summer: '#07162C',
+        autumn: '#1B110E',
+        winter: '#F0F4F8'
     };
 
     function updateColorPickerState() {

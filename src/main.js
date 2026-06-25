@@ -132,6 +132,46 @@ function applyDynamicColors() {
             textPrimary: '#ffffff',
             textSecondary: '#a3a3a3',
             borderColor: 'rgba(255, 255, 255, 0.15)'
+        },
+        spring: {
+            bgPrimary: '#fffcf9',
+            bgSecondary: '#ffffff',
+            bgTertiary: '#fdf5ef',
+            brand: '#e07a5f',
+            brandHover: '#c8654c',
+            textPrimary: '#3d3430',
+            textSecondary: '#706561',
+            borderColor: 'rgba(224, 122, 95, 0.12)'
+        },
+        summer: {
+            bgPrimary: '#07162c',
+            bgSecondary: '#0c2445',
+            bgTertiary: '#030d1b',
+            brand: '#00f5ff',
+            brandHover: '#00c5cc',
+            textPrimary: '#ffffff',
+            textSecondary: '#90a4ae',
+            borderColor: 'rgba(0, 245, 255, 0.15)'
+        },
+        autumn: {
+            bgPrimary: '#1b110e',
+            bgSecondary: '#291a15',
+            bgTertiary: '#120a08',
+            brand: '#e85d04',
+            brandHover: '#dc2f02',
+            textPrimary: '#f4f1de',
+            textSecondary: '#a69e96',
+            borderColor: 'rgba(232, 93, 4, 0.15)'
+        },
+        winter: {
+            bgPrimary: '#f0f4f8',
+            bgSecondary: '#ffffff',
+            bgTertiary: '#e1e8f0',
+            brand: '#4a90e2',
+            brandHover: '#357abd',
+            textPrimary: '#2c3e50',
+            textSecondary: '#7f8c8d',
+            borderColor: 'rgba(74, 144, 226, 0.12)'
         }
     };
 
@@ -149,7 +189,7 @@ function applyDynamicColors() {
         };
     }
 
-    const isDarkTheme = (themePreset !== 'light' && themePreset !== 'classic');
+    const isDarkTheme = (themePreset !== 'light' && themePreset !== 'classic' && themePreset !== 'spring' && themePreset !== 'winter');
     const brandTextColor = (themePreset === 'monochrome') ? '#000000' : '#ffffff';
 
     let styleTag = document.getElementById('custom-bg-style');
