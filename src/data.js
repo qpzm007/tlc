@@ -4,7 +4,9 @@ import { doc, getDoc, setDoc } from "firebase/firestore";
 export let siteData = {
     brand: {
         name: "ApexMCT",
-        logoUrl: "" // Leave empty to use text + icon, or add an image URL
+        logoUrl: "", // Leave empty to use text + icon, or add an image URL
+        heroBgOpacity: 30,
+        bgColor: "#0f172a"
     },
     menus: [
         { id: 'company', link: '#company', ko: '회사소개', en: 'Company' },

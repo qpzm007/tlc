@@ -250,6 +250,24 @@ function renderCompanyAdmin() {
                     <p class="text-xs text-gray-500 mt-1">방문자가 사이트에 처음 접속했을 때 보게 될 언어입니다.</p>
                 </div>
             </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6 pt-6 border-t border-white/5">
+                <div>
+                    <div class="flex justify-between items-center mb-2">
+                        <label class="block text-sm font-medium text-white">메인 배경 이미지 투명도</label>
+                        <span id="hero-bg-opacity-val" class="text-brand-400 font-bold text-sm">${siteData.brand.heroBgOpacity !== undefined ? siteData.brand.heroBgOpacity : 30}%</span>
+                    </div>
+                    <input type="range" id="hero-bg-opacity" min="0" max="100" class="w-full accent-brand-500 h-2 bg-metal-900 rounded-lg appearance-none cursor-pointer" value="${siteData.brand.heroBgOpacity !== undefined ? siteData.brand.heroBgOpacity : 30}">
+                    <p class="text-xs text-gray-500 mt-1">메인 화면 배경 이미지의 불투명도를 설정합니다. (0% ~ 100%)</p>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-white mb-2">전체 홈페이지 배경색</label>
+                    <div class="flex items-center space-x-2">
+                        <input type="color" id="company-bg-color" class="w-10 h-10 bg-transparent border border-white/10 rounded cursor-pointer" value="${siteData.brand.bgColor || '#0f172a'}">
+                        <input type="text" id="company-bg-color-hex" class="w-full bg-metal-900 border border-white/10 rounded-md px-4 py-2 text-white focus:outline-none focus:border-brand-500 uppercase text-center" value="${siteData.brand.bgColor || '#0F172A'}">
+                    </div>
+                    <p class="text-xs text-gray-500 mt-1">홈페이지 전체의 기본 배경색을 변경합니다. (기본값: #0F172A)</p>
+                </div>
+            </div>
         </div>
         <div class="bg-metal-800 p-6 rounded-xl border border-white/5 space-y-6 mb-6">
             <h2 class="text-xl font-bold text-white border-b border-white/10 pb-2 mb-4">연락처 및 오시는 길 (카카오/네이버 지도)</h2>
@@ -337,11 +355,33 @@ function renderCompanyAdmin() {
         </div>
     `;
 
+    // Live update for opacity slider & color picker
+    const opacitySlider = document.getElementById('hero-bg-opacity');
+    const opacityVal = document.getElementById('hero-bg-opacity-val');
+    opacitySlider.addEventListener('input', () => {
+        opacityVal.textContent = opacitySlider.value + '%';
+    });
+
+    const colorPicker = document.getElementById('company-bg-color');
+    const colorHex = document.getElementById('company-bg-color-hex');
+    colorPicker.addEventListener('input', () => {
+        colorHex.value = colorPicker.value.toUpperCase();
+    });
+    colorHex.addEventListener('input', () => {
+        const val = colorHex.value;
+        if (/^#[0-9A-F]{6}$/i.test(val)) {
+            colorPicker.value = val;
+        }
+    });
+
     document.getElementById('save-company-btn').addEventListener('click', () => {
         siteData.brand.name = document.getElementById('company-name').value;
         siteData.brand.logoUrl = document.getElementById('company-logo').value;
         siteData.brand.heroBgUrl = document.getElementById('hero-bg').value;
         siteData.brand.defaultLang = document.getElementById('default-lang').value;
+        siteData.brand.heroBgOpacity = parseInt(opacitySlider.value, 10);
+        siteData.brand.bgColor = colorPicker.value;
+        
         siteData.company.ceoMsg.ko = document.getElementById('company-ceo-ko').value.replace(/\n/g, '<br>');
         siteData.company.ceoMsg.en = document.getElementById('company-ceo-en').value.replace(/\n/g, '<br>');
         siteData.contact.phone = document.getElementById('contact-phone').value;

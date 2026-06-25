@@ -50,8 +50,62 @@ document.addEventListener('languageChanged', () => {
     init();
 });
 
+function applyDynamicColors() {
+    const bgColor = siteData?.brand?.bgColor || '#0f172a';
+    
+    function adjustColor(hex, percent) {
+        try {
+            let color = hex.replace('#', '');
+            if (color.length === 3) {
+                color = color[0] + color[0] + color[1] + color[1] + color[2] + color[2];
+            }
+            let R = parseInt(color.substring(0, 2), 16);
+            let G = parseInt(color.substring(2, 4), 16);
+            let B = parseInt(color.substring(4, 6), 16);
+
+            R = parseInt(R * (100 + percent) / 100);
+            G = parseInt(G * (100 + percent) / 100);
+            B = parseInt(B * (100 + percent) / 100);
+
+            R = Math.min(255, Math.max(0, R));
+            G = Math.min(255, Math.max(0, G));
+            B = Math.min(255, Math.max(0, B));
+
+            const rHex = R.toString(16).padStart(2, '0');
+            const gHex = G.toString(16).padStart(2, '0');
+            const bHex = B.toString(16).padStart(2, '0');
+
+            return `#${rHex}${gHex}${bHex}`;
+        } catch (e) {
+            return hex;
+        }
+    }
+    
+    const darkBg = adjustColor(bgColor, -30);
+    const lightBg = adjustColor(bgColor, 15);
+    
+    let styleTag = document.getElementById('custom-bg-style');
+    if (!styleTag) {
+        styleTag = document.createElement('style');
+        styleTag.id = 'custom-bg-style';
+        document.head.appendChild(styleTag);
+    }
+    styleTag.textContent = `
+        body, .bg-metal-900 {
+            background-color: ${bgColor} !important;
+        }
+        .bg-black {
+            background-color: ${darkBg} !important;
+        }
+        .bg-metal-800, .bg-\\[\\#0b1120\\] {
+            background-color: ${lightBg} !important;
+        }
+    `;
+}
+
 async function startup() {
     await initFirebase();
+    applyDynamicColors();
     const userPref = localStorage.getItem('tlc_user_lang');
     const defaultLang = siteData?.brand?.defaultLang || 'ko';
     
@@ -151,11 +205,13 @@ function renderHero() {
     if (!container) return;
     const defaultBg = "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80";
     const bgUrl = siteData?.brand?.heroBgUrl || defaultBg;
+    const opacityVal = siteData?.brand?.heroBgOpacity !== undefined ? siteData.brand.heroBgOpacity : 30;
+    const opacity = opacityVal / 100;
     
     container.innerHTML = `
     <section class="relative h-screen flex items-center justify-center overflow-hidden">
         <div class="absolute inset-0 z-0">
-            <img ${bgUrl.startsWith('img_') ? `data-img-id="${bgUrl}"` : `src="${bgUrl}"`} alt="Hero Background" class="${bgUrl.startsWith('img_') ? 'lazy-firebase-image' : ''} w-full h-full object-cover opacity-30 object-center">
+            <img ${bgUrl.startsWith('img_') ? `data-img-id="${bgUrl}"` : `src="${bgUrl}"`} alt="Hero Background" class="${bgUrl.startsWith('img_') ? 'lazy-firebase-image' : ''} w-full h-full object-cover object-center" style="opacity: ${opacity};">
             <div class="absolute inset-0 bg-gradient-to-b from-metal-900/80 via-metal-900/60 to-metal-900"></div>
         </div>
         
