@@ -444,7 +444,7 @@ function renderCompany() {
     container.innerHTML = `
     <section id="company" class="py-24 bg-metal-900 relative border-b border-white/5">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 reveal">
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
                 <div>
                     <h2 class="text-sm font-bold text-brand-500 tracking-widest uppercase mb-2" data-i18n="companySub"></h2>
                     <h3 class="text-3xl md:text-4xl font-bold text-white mb-6" data-i18n="ceoTitle"></h3>
@@ -461,15 +461,13 @@ function renderCompany() {
                         <span data-i18n="companyViewAll">회사소개 자세히 보기</span> <i class="ph ph-arrow-right ml-2 text-xl"></i>
                     </a>
                 </div>
-                <div class="bg-metal-800 p-8 rounded-2xl border border-white/5 relative overflow-hidden flex flex-col h-full">
+                <div class="bg-metal-800 p-8 rounded-2xl border border-white/5 relative overflow-hidden">
                     <div class="absolute -right-10 -top-10 text-brand-500/10"><i class="ph ph-certificate text-9xl"></i></div>
                     <h3 class="text-2xl font-bold text-white mb-6 relative z-10" data-i18n="certTitle"></h3>
-                    <div class="flex-grow flex items-center justify-center mb-6">
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 relative z-10 w-full">
-                            ${certsHTML}
-                        </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 relative z-10 w-full mb-6">
+                        ${certsHTML}
                     </div>
-                    <div class="text-center relative z-10 mt-auto">
+                    <div class="text-center relative z-10">
                         <a href="${import.meta.env.BASE_URL}certs.html" class="inline-block w-full border border-brand-500/30 bg-metal-900 text-brand-400 hover:bg-brand-500 hover:text-white hover:border-brand-500 font-bold py-3 px-6 rounded-xl transition duration-300">
                             <span>${currentLang === 'ko' ? '모든 인증서 보기' : 'View all certificates'}</span> <i class="ph ph-arrow-right inline-block ml-1"></i>
                         </a>
