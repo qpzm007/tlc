@@ -56,6 +56,88 @@ export let siteData = {
         'GLOBAL TECH INC.', 'AEROSPACE DYNAMICS', 'PREMIUM INSTRUMENTS', 'KOREA SEMICON', 'NEXUS INNOVATION'
     ],
     inquiries: [],
+    history: [
+        {
+            id: "h1",
+            year: "2026",
+            ko: {
+                title: "글로벌 시장 개척 및 기술 혁신",
+                items: [
+                    "글로벌 AI 솔루션 플랫폼 수출 개시",
+                    "해외 지사 설립 (미국 실리콘밸리, 일본 도쿄)",
+                    "자본금 100억원 증자"
+                ]
+            },
+            en: {
+                title: "Global Market Expansion & Tech Innovation",
+                items: [
+                    "Began export of global AI solution platform",
+                    "Established overseas branches (Silicon Valley, Tokyo)",
+                    "Increased capital to 10 billion KRW"
+                ]
+            }
+        },
+        {
+            id: "h2",
+            year: "2025",
+            ko: {
+                title: "서비스 다각화 및 도약",
+                items: [
+                    "누적 사용자수 500만 명 돌파",
+                    "정부 주관 IT 혁신 대상 수상",
+                    "WorkHub 2.0 플랫폼 신규 론칭"
+                ]
+            },
+            en: {
+                title: "Service Diversification & Leap",
+                items: [
+                    "Exceeded 5 million cumulative users",
+                    "Received Government IT Innovation Award",
+                    "Launched WorkHub 2.0 platform"
+                ]
+            }
+        },
+        {
+            id: "h3",
+            year: "2024",
+            ko: {
+                title: "기술 연구소 설립 및 시리즈 A 유치",
+                items: [
+                    "부설 기술연구소(R&D) 정식 설립 공인",
+                    "시리즈 A 투자 유치 성공 (50억 규모)",
+                    "본사 사옥 확장 이전"
+                ]
+            },
+            en: {
+                title: "R&D Lab Establishment & Series A Funding",
+                items: [
+                    "Officially certified corporate R&D laboratory",
+                    "Successfully secured Series A funding (5 billion KRW)",
+                    "Expanded and relocated headquarters"
+                ]
+            }
+        },
+        {
+            id: "h4",
+            year: "2023",
+            ko: {
+                title: "법인 설립 및 첫걸음",
+                items: [
+                    "주식회사 시너지네트웍스 설립",
+                    "첫 스마트 비즈니스 모듈 특허 출원",
+                    "벤처기업 1등급 인증 획득"
+                ]
+            },
+            en: {
+                title: "Incorporation & First Steps",
+                items: [
+                    "Established Synergy Networks Co., Ltd.",
+                    "Filed patent for the first smart business module",
+                    "Acquired Grade 1 Venture Company Certification"
+                ]
+            }
+        }
+    ],
     location: {
         ko: "대전 유성구 테크노2로 14-9 (관평동 1333)",
         en: "14-9, Techno 2-ro, Yuseong-gu, Daejeon (Gwanpyeong-dong 1333)"
@@ -140,7 +222,8 @@ export let siteData = {
             coreValuesTitle: "핵심가치",
             certViewDesc: "당사의 철저한 품질 보증 체계를 확인해보세요.",
             certViewAll: "모든 인증서 보기",
-            companyViewAll: "회사소개 자세히 보기"
+            companyViewAll: "회사소개 자세히 보기",
+            historyTitle: "회사 연혁"
         },
         en: {
             pageTitleMain: "New Standard of Precision",
@@ -189,7 +272,8 @@ export let siteData = {
             coreValuesTitle: "Core Values",
             certViewDesc: "Check out our thorough quality assurance system.",
             certViewAll: "View All Certifications",
-            companyViewAll: "View Detailed Company Info"
+            companyViewAll: "View Detailed Company Info",
+            historyTitle: "Company History"
         }
     }
 };
@@ -210,6 +294,7 @@ export async function initFirebase() {
                 location: { ...siteData.location, ...(firebaseData.location || {}) },
                 contact: { ...siteData.contact, ...(firebaseData.contact || {}) },
                 inquiries: firebaseData.inquiries || [],
+                history: firebaseData.history || siteData.history || [],
                 i18n: {
                     ko: { ...siteData.i18n.ko, ...(firebaseData.i18n?.ko || {}) },
                     en: { ...siteData.i18n.en, ...(firebaseData.i18n?.en || {}) }

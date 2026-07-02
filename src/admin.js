@@ -91,6 +91,7 @@ tabs.forEach(tab => {
         const tabName = tab.getAttribute('data-tab');
         if (tabName === 'dashboard') renderDashboard();
         if (tabName === 'company') renderCompanyAdmin();
+        if (tabName === 'history') renderHistoryAdmin();
         if (tabName === 'company_details') window.renderCompanyDetailsAdmin();
         if (tabName === 'certs') renderCertsAdmin();
         if (tabName === 'products') renderProductsAdmin();
@@ -1436,6 +1437,209 @@ window.deleteCoreValue = function(index) {
         saveSiteDataToFirebase();
         window.renderCompanyDetailsAdmin();
     }
+};
+
+
+
+function renderHistoryAdmin() {
+    try {
+        const list = siteData.history || [];
+        
+        mainContent.innerHTML = `
+            <div class="flex justify-between items-center mb-8">
+                <div>
+                    <h1 class="text-3xl font-bold text-white mb-2">회사 연혁 관리</h1>
+                    <p class="text-gray-400">회사 연혁(타임라인) 항목을 추가, 수정, 삭제하고 순서를 위/아래로 이동할 수 있습니다.</p>
+                </div>
+                <button onclick="window.openHistoryModal()" class="bg-brand-600 hover:bg-brand-500 text-white font-bold py-2 px-4 rounded-md transition flex items-center">
+                    <i class="ph ph-plus mr-2"></i> 새 연혁 추가
+                </button>
+            </div>
+            
+            <div class="grid grid-cols-1 gap-4" id="history-list">
+                ${list.length === 0 ? `
+                    <div class="bg-metal-800 p-8 rounded-lg border border-white/5 text-center text-gray-500">
+                        등록된 연혁이 없습니다.
+                    </div>
+                ` : list.map((h, index) => {
+                    const koItems = (h.ko?.items || []).map(i => `<li>- ${i}</li>`).join('');
+                    const enItems = (h.en?.items || []).map(i => `<li>- ${i}</li>`).join('');
+                    return `
+                    <div class="bg-metal-800 p-4 rounded-lg border border-white/5 flex justify-between items-center transition">
+                        <div class="flex items-start">
+                            <!-- Order buttons -->
+                            <div class="flex flex-col space-y-1 mr-4 shrink-0 justify-center h-full">
+                                <button onclick="window.moveHistoryUp(${index})" ${index === 0 ? 'disabled' : ''} class="p-1 text-gray-400 hover:text-white bg-white/5 rounded disabled:opacity-20 disabled:pointer-events-none" title="위로 이동">
+                                    <i class="ph ph-caret-up text-lg"></i>
+                                </button>
+                                <button onclick="window.moveHistoryDown(${index})" ${index === list.length - 1 ? 'disabled' : ''} class="p-1 text-gray-400 hover:text-white bg-white/5 rounded disabled:opacity-20 disabled:pointer-events-none" title="아래로 이동">
+                                    <i class="ph ph-caret-down text-lg"></i>
+                                </button>
+                            </div>
+                            
+                            <div class="bg-brand-500/10 text-brand-400 font-black text-xl px-4 py-2 rounded-lg border border-brand-500/20 mr-4">
+                                ${h.year}
+                            </div>
+                            <div>
+                                <h4 class="text-white font-bold text-lg">${h.ko?.title || ''} <span class="text-sm font-normal text-gray-500">(${h.en?.title || ''})</span></h4>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
+                                    <div>
+                                        <span class="text-xs border border-white/20 px-1 rounded text-gray-400">KO</span>
+                                        <ul class="text-xs text-gray-400 space-y-0.5 mt-1">${koItems}</ul>
+                                    </div>
+                                    <div>
+                                        <span class="text-xs border border-white/20 px-1 rounded text-gray-400">EN</span>
+                                        <ul class="text-xs text-gray-500 space-y-0.5 mt-1">${enItems}</ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex space-x-2">
+                            <button onclick="window.openHistoryModal(${index})" class="p-2 text-gray-400 hover:text-white bg-white/5 rounded-md"><i class="ph ph-pencil-simple"></i></button>
+                            <button onclick="window.deleteHistory(${index})" class="p-2 text-red-400 hover:text-red-300 bg-white/5 rounded-md"><i class="ph ph-trash"></i></button>
+                        </div>
+                    </div>
+                    `;
+                }).join('')}
+            </div>
+            
+            <!-- History Modal -->
+            <div id="history-modal" class="fixed inset-0 z-[60] hidden items-center justify-center bg-black/80 backdrop-blur-sm">
+                <div class="bg-metal-800 p-6 rounded-2xl shadow-2xl w-full max-w-2xl border border-white/10 max-h-[90vh] overflow-y-auto">
+                    <h2 id="history-modal-title" class="text-2xl font-bold text-white mb-6">연혁 추가</h2>
+                    <input type="hidden" id="history-index" value="-1">
+                    
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-white mb-1">연도 (예: 2026)</label>
+                            <input type="text" id="hist-year" class="w-full bg-metal-900 border border-white/10 rounded-md px-4 py-2 text-white focus:outline-none focus:border-brand-500" placeholder="YYYY">
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-white mb-1">대표 타이틀 (KO)</label>
+                                <input type="text" id="hist-title-ko" class="w-full bg-metal-900 border border-white/10 rounded-md px-4 py-2 text-white focus:outline-none focus:border-brand-500">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-white mb-1">대표 타이틀 (EN)</label>
+                                <input type="text" id="hist-title-en" class="w-full bg-metal-900 border border-white/10 rounded-md px-4 py-2 text-white focus:outline-none focus:border-brand-500">
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-white mb-1">상세 내역 (KO) - 한 줄에 하나씩 입력</label>
+                                <textarea id="hist-items-ko" rows="6" class="w-full bg-metal-900 border border-white/10 rounded-md px-4 py-2 text-white focus:outline-none focus:border-brand-500" placeholder="첫 번째 연혁 내용&#10;두 번째 연혁 내용"></textarea>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-white mb-1">상세 내역 (EN) - 한 줄에 하나씩 입력</label>
+                                <textarea id="hist-items-en" rows="6" class="w-full bg-metal-900 border border-white/10 rounded-md px-4 py-2 text-white focus:outline-none focus:border-brand-500" placeholder="First history item&#10;Second history item"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex justify-end space-x-3 mt-8">
+                        <button onclick="document.getElementById('history-modal').classList.replace('flex', 'hidden')" class="px-6 py-2 rounded-md bg-white/10 text-white hover:bg-white/20 transition">취소</button>
+                        <button onclick="window.saveHistory()" class="px-6 py-2 rounded-md bg-brand-600 text-white hover:bg-brand-500 transition">저장</button>
+                    </div>
+                </div>
+            </div>
+        `;
+    } catch (e) {
+        mainContent.innerHTML = `<div class="p-8 text-red-500 bg-red-500/10 rounded-xl"><h3>오류 발생</h3><pre>${e.stack}</pre></div>`;
+        console.error(e);
+    }
+}
+
+window.openHistoryModal = function(index = -1) {
+    const modal = document.getElementById('history-modal');
+    const isEdit = index >= 0;
+    document.getElementById('history-modal-title').innerText = isEdit ? '연혁 수정' : '새 연혁 추가';
+    document.getElementById('history-index').value = index;
+    
+    if (isEdit) {
+        const h = siteData.history[index];
+        document.getElementById('hist-year').value = h.year || '';
+        document.getElementById('hist-title-ko').value = h.ko?.title || '';
+        document.getElementById('hist-title-en').value = h.en?.title || '';
+        document.getElementById('hist-items-ko').value = (h.ko?.items || []).join('\n');
+        document.getElementById('hist-items-en').value = (h.en?.items || []).join('\n');
+    } else {
+        document.getElementById('hist-year').value = '';
+        document.getElementById('hist-title-ko').value = '';
+        document.getElementById('hist-title-en').value = '';
+        document.getElementById('hist-items-ko').value = '';
+        document.getElementById('hist-items-en').value = '';
+    }
+    
+    modal.classList.replace('hidden', 'flex');
+};
+
+window.saveHistory = function() {
+    const index = parseInt(document.getElementById('history-index').value);
+    
+    const year = document.getElementById('hist-year').value.trim();
+    const titleKo = document.getElementById('hist-title-ko').value.trim();
+    const titleEn = document.getElementById('hist-title-en').value.trim();
+    const itemsKo = document.getElementById('hist-items-ko').value.split('\n').map(x => x.trim()).filter(x => x);
+    const itemsEn = document.getElementById('hist-items-en').value.split('\n').map(x => x.trim()).filter(x => x);
+    
+    if (!year) {
+        alert("연도를 입력해 주세요.");
+        return;
+    }
+    
+    const h = {
+        id: index >= 0 && siteData.history[index].id ? siteData.history[index].id : 'h' + Date.now(),
+        year: year,
+        ko: {
+            title: titleKo,
+            items: itemsKo
+        },
+        en: {
+            title: titleEn,
+            items: itemsEn
+        }
+    };
+    
+    if (!siteData.history) {
+        siteData.history = [];
+    }
+    
+    if (index >= 0) {
+        siteData.history[index] = h;
+    } else {
+        siteData.history.push(h);
+    }
+    
+    saveSiteDataToFirebase();
+    document.getElementById('history-modal').classList.replace('flex', 'hidden');
+    renderHistoryAdmin();
+};
+
+window.deleteHistory = function(index) {
+    if (confirm("정말로 이 연혁 항목을 삭제하시겠습니까?")) {
+        if (!siteData.history) siteData.history = [];
+        siteData.history.splice(index, 1);
+        saveSiteDataToFirebase();
+        renderHistoryAdmin();
+    }
+};
+
+window.moveHistoryUp = function(index) {
+    if (index <= 0) return;
+    const temp = siteData.history[index];
+    siteData.history[index] = siteData.history[index - 1];
+    siteData.history[index - 1] = temp;
+    saveSiteDataToFirebase();
+    renderHistoryAdmin();
+};
+
+window.moveHistoryDown = function(index) {
+    if (index >= siteData.history.length - 1) return;
+    const temp = siteData.history[index];
+    siteData.history[index] = siteData.history[index + 1];
+    siteData.history[index + 1] = temp;
+    saveSiteDataToFirebase();
+    renderHistoryAdmin();
 };
 
 

@@ -441,6 +441,33 @@ function renderCompany() {
         </div>
     `).join('');
 
+    const historyHTML = (siteData.history || [])
+        .map(item => {
+            const title = item[currentLang]?.title || '';
+            const listItems = (item[currentLang]?.items || [])
+                .map(subItem => `
+                <li class="text-sm text-gray-400 flex items-start gap-2">
+                    <span class="text-brand-500 mt-1.5 w-1.5 h-1.5 rounded-full bg-brand-500 shrink-0"></span>
+                    <span>${subItem}</span>
+                </li>
+            `).join('');
+
+            return `
+            <div class="relative">
+                <div class="absolute -left-[31px] top-1.5 bg-metal-900 border-2 border-brand-500 w-4 h-4 rounded-full flex items-center justify-center">
+                    <div class="w-1.5 h-1.5 bg-brand-500 rounded-full"></div>
+                </div>
+                <div>
+                    <span class="text-lg font-black text-brand-400 tracking-tight">${item.year}</span>
+                    <h4 class="text-white font-bold text-base mt-0.5 mb-2">${title}</h4>
+                    <ul class="space-y-1.5">
+                        ${listItems}
+                    </ul>
+                </div>
+            </div>
+            `;
+        }).join('');
+
     container.innerHTML = `
     <section id="company" class="py-24 bg-metal-900 relative border-b border-white/5">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 reveal">
@@ -457,20 +484,37 @@ function renderCompany() {
                         <p class="text-gray-400 text-sm" data-ko="${siteData.company.vision.ko.desc}" data-en="${siteData.company.vision.en.desc}">${siteData.company.vision[currentLang].desc}</p>
                     </div>
                     ` : ''}
-                    <a href="${import.meta.env.BASE_URL || '/'}company.html" class="inline-flex items-center text-brand-400 font-bold hover:text-white transition duration-300">
-                        <span data-i18n="companyViewAll">회사소개 자세히 보기</span> <i class="ph ph-arrow-right ml-2 text-xl"></i>
-                    </a>
-                </div>
-                <div class="bg-metal-800 p-8 rounded-2xl border border-white/5 relative overflow-hidden">
-                    <div class="absolute -right-10 -top-10 text-brand-500/10"><i class="ph ph-certificate text-9xl"></i></div>
-                    <h3 class="text-2xl font-bold text-white mb-6 relative z-10" data-i18n="certTitle"></h3>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 relative z-10 w-full mb-6">
-                        ${certsHTML}
-                    </div>
-                    <div class="text-center relative z-10">
-                        <a href="${import.meta.env.BASE_URL}certs.html" class="inline-block w-full border border-brand-500/30 bg-metal-900 text-brand-400 hover:bg-brand-500 hover:text-white hover:border-brand-500 font-bold py-3 px-6 rounded-xl transition duration-300">
-                            <span>${currentLang === 'ko' ? '모든 인증서 보기' : 'View all certificates'}</span> <i class="ph ph-arrow-right inline-block ml-1"></i>
+                    <div class="mb-12">
+                        <a href="${import.meta.env.BASE_URL || '/'}company.html" class="inline-flex items-center text-brand-400 font-bold hover:text-white transition duration-300">
+                            <span data-i18n="companyViewAll">회사소개 자세히 보기</span> <i class="ph ph-arrow-right ml-2 text-xl"></i>
                         </a>
+                    </div>
+                    
+                    <!-- Moved Certifications (인증 현황) -->
+                    <div class="bg-metal-800 p-8 rounded-2xl border border-white/5 relative overflow-hidden">
+                        <div class="absolute -right-6 -top-6 text-brand-500/10"><i class="ph ph-certificate text-7xl"></i></div>
+                        <h3 class="text-xl font-bold text-white mb-6 relative z-10" data-i18n="certTitle"></h3>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 relative z-10 w-full mb-6">
+                            ${certsHTML}
+                        </div>
+                        <div class="text-center relative z-10">
+                            <a href="${import.meta.env.BASE_URL}certs.html" class="inline-block w-full border border-brand-500/30 bg-metal-900 text-brand-400 hover:bg-brand-500 hover:text-white hover:border-brand-500 font-bold py-2.5 px-6 rounded-xl transition duration-300 text-sm">
+                                <span>${currentLang === 'ko' ? '모든 인증서 보기' : 'View all certificates'}</span> <i class="ph ph-arrow-right inline-block ml-1"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Company History (회사 연혁) in place of Certifications -->
+                <div class="bg-metal-800 p-8 rounded-2xl border border-white/5 relative overflow-hidden">
+                    <div class="absolute -right-10 -top-10 text-brand-500/10"><i class="ph ph-calendar-blank text-9xl"></i></div>
+                    <h3 class="text-2xl font-bold text-white mb-8 relative z-10 flex items-center gap-2">
+                        <i class="ph ph-calendar-blank text-brand-500"></i>
+                        <span data-i18n="historyTitle">회사 연혁</span>
+                    </h3>
+                    
+                    <div class="relative pl-6 border-l-2 border-brand-500/30 space-y-8 ml-2 z-10">
+                        ${historyHTML || `<p class="text-gray-400 text-sm">등록된 연혁이 없습니다.</p>`}
                     </div>
                 </div>
             </div>
