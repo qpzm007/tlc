@@ -45,7 +45,7 @@ function initLightbox() {
                 <i class="ph ph-x"></i>
             </button>
             <div class="max-w-4xl max-h-[85vh] px-4 flex flex-col items-center justify-center cursor-default" onclick="event.stopPropagation()">
-                <img id="lightbox-img" class="max-w-full max-h-[75vh] object-contain rounded-lg shadow-2xl border border-white/10 bg-white p-4" src="" alt="Certificate Detail">
+                <img id="lightbox-img" class="max-w-full max-h-[75vh] object-contain rounded-lg shadow-2xl border border-white/10 bg-white p-4 cursor-zoom-out" src="" alt="Certificate Detail">
                 <h4 id="lightbox-title" class="text-2xl font-bold text-white mt-4 text-center"></h4>
                 <p id="lightbox-desc" class="text-brand-400 text-base mt-1 text-center"></p>
             </div>
@@ -54,6 +54,7 @@ function initLightbox() {
 
         modal.addEventListener('click', closeLightbox);
         modal.querySelector('button').addEventListener('click', closeLightbox);
+        modal.querySelector('#lightbox-img').addEventListener('click', closeLightbox);
 
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape' && !modal.classList.contains('hidden')) {
