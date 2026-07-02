@@ -1607,7 +1607,7 @@ window.saveHistory = function() {
     if (index >= 0) {
         siteData.history[index] = h;
     } else {
-        siteData.history.push(h);
+        siteData.history.unshift(h);
     }
     
     saveSiteDataToFirebase();
